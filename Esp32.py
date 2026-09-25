@@ -31,23 +31,23 @@ class Esp32:
         try:
                 
             request_headers = {
-                "turn":f"{self.sending_angle}","speed":f"{self.sending_speed}","distance":f"{"front"}"
+                "turn":f"{self.sending_angle}","speed":f"{self.sending_speed}"
             }
             print(request_headers)
-            #if any input is not 0 then reassign that variable
+            #Send an http post request with headers containing information
             response = requests.post(IP + "/", headers=request_headers, timeout=0.5) #the / means the main get, top file directory
             #process the response
             content_type = response.headers.get("Response-Type")
             content = response.content.decode(encoding = "utf-8")
             
-            #print(content_type)
-            #print(content)
             response.close()
-            
-            if (content_type == "distance"):
-                return content
-            else:
-                return "Response not in recognised format"
+            #split types of distance sensors (eg. BACK1, LEFT...)
+            type_array = content_type.split(" ")
+            #split content by spaces (floats but stored as a string)
+            content_array = content.split(" ")
+            #make a dictionary of content and types
+            distances = dict(zip(type_array, content_array))
+            return distances
         except Exception as e:
             print("Error: ", e)
             return 0
