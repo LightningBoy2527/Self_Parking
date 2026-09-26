@@ -202,10 +202,10 @@ class Car:
 
 
     def MoveTo(self, target_x, target_y, target_dir): 
-        AGGRESSIVENESS = 1.5
+        AGGRESSIVENESS = 1.8
         CLOSE_DIST =  100#mm
-        TARGET_LINE_WIDTH = 8
-        BACKUP_DIST = TURNING_RADIUS /2 #mm
+        TARGET_LINE_WIDTH = 10
+        BACKUP_DIST = LENGTH #mm
 
         
 
@@ -224,30 +224,38 @@ class Car:
 
         dtheta_path = (((path_dir - self_dir + np.pi) % (2 * np.pi)) - np.pi) 
         print(f"dtheta_path: {dtheta_path}\npath_dir: {path_dir}\nself_dir:{self_dir}")
-        dtheta_target = ((target_dir - self.wheel_dir + self.dir + np.pi) % (2 * np.pi)) - np.pi        
+        dtheta_wheels_target = ((target_dir - self.wheel_dir + self.dir + np.pi) % (2 * np.pi)) - np.pi       
+        dtheta_target = ((target_dir - self.dir + np.pi) % (2 * np.pi)) - np.pi    
 
-        closeness = (min(1, max(0.01, (CLOSE_DIST - dist_to_target) / CLOSE_DIST))**10)
+        closeness = (min(1, max(0.01, (CLOSE_DIST - dist_to_target) / CLOSE_DIST))**5)
         print(f"closeness: {closeness}")
         side = np.sign(dist_to_target_line)
         if side == 0: side = 1
-        facing = np.sign(dtheta_target)
+        facing = np.sign(dtheta_wheels_target)
         if facing == 0: facing = 1
         forwards = np.sign(self.speed)
         if forwards == 0: forwards = 1
         overshot = np.sign(angle_alignment) > 0
 
-        leaving_target_line = out_of_lineness * dist_to_target_line * facing * side > TARGET_LINE_WIDTH / 2
+        leaving_target_line = abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
 
         print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
         target_wheel_dir = AGGRESSIVENESS * dtheta_path * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
+        if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
+            print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
+            if forwards == -1:
+                target_wheel_dir = -AGGRESSIVENESS * dtheta_target * 0.5 + target_wheel_dir * -0.5
+            if forwards == 1 and abs(dtheta_target) < 0.1:
+                target_wheel_dir = AGGRESSIVENESS * dtheta_target * 0.9 + target_wheel_dir * -0.1
+
         #target_wheel_dir = target_wheel_dir * abs(forwards + 0.8) / 1.8 * AGGRESSIVENESS
         
         # have we overshot?
         if leaving_target_line:
             target_speed = -min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * facing * forwards
-        elif forwards < 0 and (out_of_lineness < 0.1 and dist_to_target > BACKUP_DIST):
+        elif forwards < 0 and (out_of_lineness < 0.2 and dist_to_target > BACKUP_DIST):
             target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
         if overshot:
             target_speed = -min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
