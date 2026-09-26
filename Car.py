@@ -11,6 +11,7 @@ LENGTH = 179 #mm
 CAR_SIZE = (LENGTH, WIDTH)
 WHEEL_SIZE = (23, 15)
 TURNING_RADIUS = 245 # mm
+REAL_TURNING_RADIUS = TURNING_RADIUS * 1.22
 COLOUR = (80,80,80)
 WHEEL_COLOUR = (0,0,0)
 
@@ -53,6 +54,7 @@ class Car:
         self.distance_data = {}
         self.colour_data = {}
         self.hit_data = {}
+        self.visited_colours = []
 
         self.sensors = ( 
             PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self),
@@ -303,13 +305,29 @@ class Car:
             self.MoveTo(self.target_x, self.target_y, 0)
             if self.DistTo(self.target_x, self.target_y) < 5:
                 self.state = "PARKING"
-                self.speed = abs(self.speed)
+                self.speed = 1
 
         elif self.state == "PARKING":
             self.FindTarget(arena)
             self.MoveTo(self.target_x, self.target_y, np.pi* 3 / 2)
-            if self.DistTo(self.target_x, self.target_y) < 3: 
+            if self.DistTo(self.target_x, self.target_y) < 3 and self.state == "PARKING": 
+                self.state = "PARKED"
+
+        elif self.state == "PARKED":
+            cv.waitKey(0)
+            self.FindTarget(arena)
+            if self.state != "REVERSING_OUT":
                 self.state = "DONE"
+            else:
+                self.speed = -1
+
+        elif self.state == "REVERSING_OUT":
+            self.MoveTo(self.target_x, self.target_y, 0)
+            if self.DistTo(self.target_x, self.target_y) < 5:
+                self.state = "SEARCHING_FOR_TARGET"
+                self.speed = 1
+
+
 
         print(self.state)
         #print(f"Target: {self.target_x}, {self.target_y}")
@@ -435,28 +453,41 @@ class Car:
                         rect.Draw(arena.img)
 
     def FindTarget(self, arena):
-        if self.state == "DONE":
+        if self.state == "DONE" or self.state == "REVERSING OUT":
             pass
+
         empty_parks = [park for park in arena.car_rects if not park.filled]
-        target_rects = [rect for rect in arena.colour_rects if rect.filled]
+        target_rects = [rect for rect in arena.colour_rects if rect.filled and not any(np.array_equal(colour, rect.colour) for colour in self.visited_colours)] # very long line # very useful comment
         target_parks = []
+        target_park_rects = []
         for park in empty_parks:
             for rect in target_rects:
                 if park.center[0] == rect.center[0]:
                     target_parks.append(park)
+                    target_park_rects.append(rect)
+
 
         if len(target_parks) > 0:
             if self.state == "SEARCHING_FOR_TARGET":
                 self.state = "PREPARING_TO_PARK"
             target_park = sorted(target_parks, key = lambda rect: rect.pt1[0])[0]
+            target_park_rect = sorted(target_park_rects, key = lambda rect: rect.pt1[0])[0]
+            if self.state == "PARKED":
+                print("here")
+                self.visited_colours.append(target_park_rect.colour)
+                self.state = "REVERSING_OUT"
+                self.target_x = target_park.center[0] - REAL_TURNING_RADIUS
+                self.target_y = arena.start_pos[1]
             if self.state == "PARKING":
                 (self.target_x, self.target_y) = target_park.center
                 return
             if self.state == "PREPARING_TO_PARK":
-                self.target_x = target_park.center[0] - TURNING_RADIUS * 1.15
+                self.target_x = target_park.center[0] - REAL_TURNING_RADIUS
                 self.target_y = arena.start_pos[1]
                 return
         else:
+            
             self.state = "SEARCHING_FOR_TARGET"
             self.target_x = min(Arena.TOTAL_WIDTH - arena.start_pos[0], self.x + LENGTH * 1.5)
             self.target_y = arena.start_pos[1]
+        

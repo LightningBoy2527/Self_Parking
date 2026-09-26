@@ -37,6 +37,8 @@ COLOUR_CODE = {     #colour codes for known x, y walls in colour coded arena
     (0,130,0): (None, PARK_DEPTH)
 }
 
+VISITED = (67,67,67)
+
 
 
 class Arena:
