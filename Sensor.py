@@ -85,6 +85,7 @@ class PID(Sensor):
 
     def SenseSimDist(self, arena):
         img = arena.img
+        print(f"Current Sensor location: {self.x}, {self.y}")
         (x, y) = self.FindRayIntercept(img, 0)
         dx = x - self.x
         dy = y - self.y

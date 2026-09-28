@@ -11,7 +11,7 @@ LENGTH = 179 #mm
 CAR_SIZE = (LENGTH, WIDTH)
 WHEEL_SIZE = (23, 15)
 TURNING_RADIUS = 245 # mm
-REAL_TURNING_RADIUS = TURNING_RADIUS * 1.22
+REAL_TURNING_RADIUS = TURNING_RADIUS * 1.1
 COLOUR = (80,80,80)
 WHEEL_COLOUR = (0,0,0)
 
@@ -204,7 +204,7 @@ class Car:
 
 
     def MoveTo(self, target_x, target_y, target_dir): 
-        AGGRESSIVENESS = 1.8
+        AGGRESSIVENESS = 1
         CLOSE_DIST =  100#mm
         TARGET_LINE_WIDTH = 10
         BACKUP_DIST = LENGTH #mm
@@ -237,25 +237,25 @@ class Car:
         if forwards == 0: forwards = 1
         overshot = np.sign(angle_alignment) > 0
 
-        leaving_target_line = abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
+        leaving_target_line = -abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
 
         print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
-        target_wheel_dir = AGGRESSIVENESS * np.sqrt(dtheta_path) * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
+        target_wheel_dir = dtheta_path * self.max_wheel_dir * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
         if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
             print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
             if forwards == -1:
-                target_wheel_dir = -AGGRESSIVENESS * dtheta_target * 0.5 + target_wheel_dir * -0.5
+                target_wheel_dir = -dtheta_target * 0.5 + target_wheel_dir * -0.5
             if forwards == 1 and abs(dtheta_target) < 0.1:
-                target_wheel_dir = AGGRESSIVENESS * dtheta_target * 0.9 + target_wheel_dir * -0.1
+                target_wheel_dir =  dtheta_target * 0.9 + target_wheel_dir * -0.1
 
         #target_wheel_dir = target_wheel_dir * abs(forwards + 0.8) / 1.8 * AGGRESSIVENESS
         
         # have we overshot?
         if leaving_target_line:
-            target_speed = -min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * facing * forwards
-        elif forwards < 0 and (out_of_lineness < 0.2 and dist_to_target > BACKUP_DIST):
+                target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * facing
+        elif forwards < 0 and (out_of_lineness < 0.1 and dist_to_target > BACKUP_DIST):
             target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
         if overshot:
             target_speed = -min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
@@ -313,6 +313,7 @@ class Car:
 
         elif self.state == "PARKED":
             cv.waitKey(0)
+            self.UpdateClockDiff()
             self.FindTarget(arena)
             if self.state != "REVERSING_OUT":
                 self.state = "DONE"

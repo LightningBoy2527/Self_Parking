@@ -73,7 +73,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
         displayArena = generated_arena.img.copy()
         sensedArena = arena.img.copy()
         car.Move(real)
-        car.Draw(displayArena)
+        car.Draw(displayArena) 
         car.Draw(sensedArena)
         try:
             cv.drawMarker(sensedArena, Arena.offsetPt((int(car.target_x), int(car.target_y))), (120, 80, 200), cv.MARKER_DIAMOND, 10, 5 )
