@@ -2,6 +2,8 @@ import numpy as np
 import Arena
 import ColourCheck
 import Image
+import subprocess
+import sys
 
 class Sensor:
     def __init__(self, x, y, dir, parent):
@@ -59,6 +61,9 @@ class Sensor:
 
 
 class Camera(Sensor):
+    def StartCamera():
+        subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
+        
     def SenseSimColour(self, arena, ray_angle):
             img = arena.img
             (x, y) = self.FindRayIntercept(img, ray_angle)
