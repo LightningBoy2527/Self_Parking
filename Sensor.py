@@ -1,6 +1,6 @@
 import numpy as np
 import Arena
-import ColourCheck
+import ColorCheck as ColourCheck
 import Image
 import subprocess
 import sys
@@ -11,6 +11,7 @@ class Sensor:
         self.y_offset = y
         self.dir_offset = dir
         self.parent = parent
+        print(f"Initial Sensor location: {x}, {y}")
 
     @property
     def x(self):

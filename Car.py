@@ -209,8 +209,6 @@ class Car:
         TARGET_LINE_WIDTH = 10
         BACKUP_DIST = LENGTH #mm
 
-        
-
         dx = (target_x - self.x)
         dy = (target_y - self.y)
         
@@ -244,7 +242,7 @@ class Car:
         print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
-        target_wheel_dir = AGGRESSIVENESS * dtheta_path * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
+        target_wheel_dir = AGGRESSIVENESS * np.sqrt(dtheta_path) * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
         if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
             print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
             if forwards == -1:
@@ -273,7 +271,7 @@ class Car:
 
     def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real):
 
-        for sensor in self.esp.sensors:
+        for sensor in self.esp.sensors.values():
             if real:
                 self.distance_data[sensor] = sensor.SenseRealDist()
             else:
@@ -344,7 +342,7 @@ class Car:
 
         hit_1d = {}
 
-        for sensor in self.sensors:
+        for sensor in self.esp.sensors.values():
             hit = self.hit_data[sensor]
             dist = self.distance_data[sensor]
 
