@@ -47,7 +47,10 @@ class Esp32:
             content_array = content.split(" ")
             #make a dictionary of content and types
             distances = dict(zip(type_array, content_array))
-            return distances
+            if len(distances) > 0:
+                for sensor in distances.keys():
+                    self.sensors[sensor].last_sensed = distances[sensor]
+            return
         except Exception as e:
             print("Error: ", e)
             return 0

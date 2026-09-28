@@ -1,5 +1,7 @@
 import numpy as np
 import Arena
+import ColourCheck
+import Image
 
 class Sensor:
     def __init__(self, x, y, dir, parent):
@@ -64,11 +66,17 @@ class Camera(Sensor):
             #print(f"{colour} at {x}, {y}")
             return colour
 
+    def InitialiseReal(self):
+        ColourCheck.ScanStart(Image.ReadImage())
 
     def SenseRealColour(self, ray_angle):
-        pass
+        Image.SenseRealColour(ray_angle)
 
 class PID(Sensor):
+    def __init__(self, x, y, dir, parent, initial_sense):
+        super().__init__(x, y, dir, parent)
+        self.last_sensed = initial_sense
+
     def SenseSimDist(self, arena):
         img = arena.img
         (x, y) = self.FindRayIntercept(img, 0)
@@ -89,4 +97,4 @@ class PID(Sensor):
 
 
     def SenseRealDist(self):
-         pass
+        return self.last_sensed

@@ -12,6 +12,12 @@ COLOURS = { #BGR
     "YELLOW": (0, 255, 255)
 }
 
+IGNORED_COLOURS = {
+    "BACKGROUND": Arena.BACKGROUND_COLOUR,
+    "WALL": Arena.WALL_COLOUR,
+    "CAR": Arena.PARKED_CAR_COLOUR
+}
+
 def FindControllerXY(ds):
     x = ds.state.RX
     y = ds.state.LY
@@ -62,7 +68,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
     car.state = "FINDING_START_COLOURS"
     while (car.state != "DONE"):
         car.UpdateClockDiff()
-        car.DoAutomation(generated_arena, code_arena, arena, COLOURS.values(), real)
+        car.DoAutomation(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real)
         
         displayArena = generated_arena.img.copy()
         sensedArena = arena.img.copy()

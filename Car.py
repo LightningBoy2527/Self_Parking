@@ -56,12 +56,12 @@ class Car:
         self.hit_data = {}
         self.visited_colours = []
 
-        self.sensors = ( 
-            PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self),
-            PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self),
-            PID(0, WIDTH/2 + BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self),
-            PID(0, WIDTH/2 - BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self),
-        )
+        self.sensors = { 
+            "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
+            "RIGHT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self, Arena.TRACK_WIDTH - WIDTH - Arena.START_OFFSET_Y),
+            "BACK1": PID(0, WIDTH/2 + BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
+            "BACK2": PID(0, WIDTH/2 - BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
+        }
 
         self.esp = Esp32.Esp32("connectioninfo", self, self.sensors)
 
@@ -271,7 +271,7 @@ class Car:
 
 
 
-    def DoAutomation(self, generated_arena, code_arena, arena, target_colours, real):
+    def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real):
 
         for sensor in self.esp.sensors:
             if real:
@@ -288,7 +288,7 @@ class Car:
             else:
                 self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
             if self.colour_data[angle] is not None:
-                self.InterpretCameraData(arena, angle, self.colour_data[angle], target_colours)
+                self.InterpretCameraData(arena, angle, self.colour_data[angle], ignored_colours)
             
         if self.state == "FINDING_START_COLOURS":
             self.MoveTo(self.target_x, self.target_y, 0)
@@ -417,7 +417,7 @@ class Car:
         else:
             return False
 
-    def InterpretCameraData(self, arena, angle, colour, target_colours):
+    def InterpretCameraData(self, arena, angle, colour, ignored_colours):
         if colour != Arena.PARKED_CAR_COLOUR:
             while np.array_equal(self.camera.SenseSimColour(arena, angle), Arena.PARKED_CAR_COLOUR): 
                 (x, y) = self.camera.FindRayIntercept(arena.img, angle)
@@ -428,17 +428,15 @@ class Car:
                         car_rect.Draw(arena.img)
 
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
-        for target_colour in target_colours:
-            #print(f"colour: {colour}, target_colour: {target_colour}")
-            if np.array_equal(colour, target_colour):
-                for rect in (arena.start_rects):
-                    if self.PointInRect(x, y, rect):
-                        rect.colour = colour
-                        rect.Draw(arena.img)
-                        if self.state == "FINDING_START_COLOURS":
-                            self.state = "SEARCHING_FOR_TARGET"
-                            self.target_x = Arena.TOTAL_WIDTH - arena.start_pos[0]
-                            self.target_y = arena.start_pos[1]
+        if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
+            for rect in (arena.start_rects):
+                if self.PointInRect(x, y, rect):
+                    rect.colour = colour
+                    rect.Draw(arena.img)
+                    if self.state == "FINDING_START_COLOURS":
+                        self.state = "SEARCHING_FOR_TARGET"
+                        self.target_x = Arena.TOTAL_WIDTH - arena.start_pos[0]
+                        self.target_y = arena.start_pos[1]
 
         valid_park_colours = []
         for start_rect in arena.start_rects:
