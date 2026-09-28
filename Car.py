@@ -231,18 +231,21 @@ class Car:
         print(f"closeness: {closeness}")
         side = np.sign(dist_to_target_line)
         if side == 0: side = 1
-        facing = np.sign(dtheta_wheels_target)
+        facing = np.sign(dtheta_wheels_target) * side
         if facing == 0: facing = 1
         forwards = np.sign(self.speed)
         if forwards == 0: forwards = 1
         overshot = np.sign(angle_alignment) > 0
 
-        leaving_target_line = -abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
+        leaving_target_line = abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
 
         print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
-        target_wheel_dir = dtheta_path * self.max_wheel_dir * (1-closeness) * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
+        if out_of_lineness > 0.1:
+            target_wheel_dir = dtheta_wheels_target * 1.6
+        else:
+            target_wheel_dir = dtheta_path * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
         if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
             print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
             if forwards == -1:
