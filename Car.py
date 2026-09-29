@@ -73,7 +73,7 @@ def FindIntersection(x1, y1, theta1, x2, y2, theta2):
         intersection = np.linalg.solve(A, b)
         return intersection
     except np.linalg.LinAlgError:
-        return None
+        return (None, None)
 
 
 class Car:
@@ -241,14 +241,17 @@ class Car:
 
 
 
-        
+    def HasOvershot(self, target_x, target_y, target_dir):
+        pass
         
 
         
     def Move2(self, target_x, target_y, target_dir):
         CLOSE_DIST =  100#mm
-        TARGET_LINE_WIDTH = 10
+        TARGET_WIDTH = 10
         BACKUP_DIST = LENGTH #mm
+        OVERSTEER = 1.1
+        LOCK_IN_ANGLE = np.pi/20
 
         #cartesian numbers
         dx = target_x - self.x
@@ -263,15 +266,35 @@ class Car:
         car_alignment = AngleAlignment(self.dir, target_dir) # 1 if aligned, 0 if perpendicular, -1 if facing reverse
         wheel_alignment = AngleAlignment(Normalise(self.dir + self.wheel_dir), target_dir) # 1 if aligned, 0 if perpendicular, -1 if facing reverse
 
+        # 0 to 1
+        line_alignment = 1 - abs(dist_to_target_line / dist_to_target) # 1 if on line, 0 if perpendicular
+
         # pseudo booleans
+        car_aiming_left = 1 if dtheta > 0 else -1
         left_of_line = 1 if dist_to_target_line > 0 else -1
+        car_facing_line = 1 if car_alignment > 0 else -1
+        wheels_facing_line = 1 if wheel_alignment > 0 else -1
+        moving_forwards = 1 if self.speed > 0 else -1
+        overshot = 1 if car_alignment > 0 else -1
         
         if self.movement_state == "TRACKING_LINE":
+            target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
+            target_wheel_dir = dtheta * line_alignment + (1 - line_alignment) * self.max_wheel_dir * left_of_line
 
-            overshot = 1 if car_alignment > 0 else -1
-            pass
+            #
+            turning_point_n = REAL_TURNING_RADIUS(1+np.cos(dtheta))
+            turning_point_t = turning_point_n / np.tan(dtheta)
+    
+            intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
+            if intersection_point_x is not None:
+                turning_point_x = intersection_point_x - turning_point_n * np.cos(target_dir) - turning_point_t * np.sin(target_dir)
+                turning_point_y = intersection_point_y - turning_point_n * np.sin(target_dir) - turning_point_t * np.cos(target_dir)
+                if abs(dist_to_target_line) > TARGET_WIDTH and self.DistTo(turning_point_x, turning_point_y) < TARGET_WIDTH:
+                    self.movement_state = "TURNING"
+            elif  abs(dist_to_target_line) > TARGET_WIDTH or abs(dtheta) < LOCK_IN_ANGLE or car_facing_line == -1:
+                self.movement_state = "BACKING_UP"
 
-        elif self.movement_state == "TURNING":
+        if self.movement_state == "TURNING":
 
             pass
 
@@ -279,13 +302,7 @@ class Car:
             pass
         
 
-        #new stuff
-        turning_point_n = REAL_TURNING_RADIUS(1+np.cos(dtheta))
-        turning_point_t = turning_point_n / np.tan(dtheta)
-
-        intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
-        turning_point_x = intersection_point_x - turning_point_n * np.cos(target_dir) - turning_point_t * np.sin(target_dir)
-        turning_point_y = intersection_point_y - turning_point_n * np.sin(target_dir) - turning_point_t * np.cos(target_dir)
+        
 
 
 
