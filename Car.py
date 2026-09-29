@@ -242,22 +242,22 @@ class Car:
         print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
-        if out_of_lineness > 0.1:
-            target_wheel_dir = dtheta_wheels_target * 1.6
+        if abs(dtheta_target) > 0.05:
+            target_wheel_dir = dtheta_wheels_target * 1.6 * forwards
         else:
             target_wheel_dir = dtheta_path * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
         if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
             print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
             if forwards == -1:
-                target_wheel_dir = -dtheta_target * 0.5 + target_wheel_dir * -0.5
-            if forwards == 1 and abs(dtheta_target) < 0.1:
-                target_wheel_dir =  dtheta_target * 0.9 + target_wheel_dir * -0.1
+                target_wheel_dir = dtheta_target * 0.3 + target_wheel_dir * 0.7
+            if forwards == 1 and abs(dtheta_target) < 0.05:
+                target_wheel_dir =  np.sign(target_wheel_dir) * -1
 
         #target_wheel_dir = target_wheel_dir * abs(forwards + 0.8) / 1.8 * AGGRESSIVENESS
         
         # have we overshot?
         if leaving_target_line:
-                target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * facing
+                target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
         elif forwards < 0 and (out_of_lineness < 0.1 and dist_to_target > BACKUP_DIST):
             target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target))
         if overshot:
