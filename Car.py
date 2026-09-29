@@ -39,6 +39,43 @@ def Dot(x1, y1, x2, y2):
 def Cross(x1, y1, x2, y2):
     return x1 * y2 - x2 * y1
 
+def DistAB(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+    return np.sqrt(dx**2 + dy**2)
+
+def Normalise(angle):
+    return (angle + np.pi) % (2 * np.pi) - np.pi
+
+def AngleAlignment(theta1, theta2): # 1 if aligned, 0 if perpendicular, -1 if facing reverse
+    return Dot(np.cos(theta1), -np.sin(theta1), np.cos(theta2), -np.sin(theta2)) 
+
+def FindIntersection(x1, y1, theta1, x2, y2, theta2):
+    # Set up coefficients (Ax + By = C) for Line 1
+    A1 = np.sin(theta1)
+    B1 = -np.cos(theta1)
+    C1 = x1 * np.sin(theta1) - y1 * np.cos(theta1)
+    
+    # Set up coefficients for Line 2
+    A2 = np.sin(theta2)
+    B2 = -np.cos(theta2)
+    C2 = x2 * np.sin(theta2) - y2 * np.cos(theta2)
+    
+    # Construct matrices A and b
+    A = np.array([
+        [A1, B1],
+        [A2, B2]
+    ])
+    b = np.array([C1, C2])
+    
+    try:
+        # Solve the linear system
+        intersection = np.linalg.solve(A, b)
+        return intersection
+    except np.linalg.LinAlgError:
+        return None
+
+
 class Car:
      
     def __init__(self, centerX, centerY, direction):
@@ -49,6 +86,7 @@ class Car:
         self.wheel_dir = 0
         self.wheelbase = 120 
         self.state = "UNINITIALISED"
+        self.movement_state = "TRACKING_LINE"
         self.current_time = time.perf_counter() 
         self.last_time = self.current_time - 0.001
         self.distance_data = {}
@@ -197,9 +235,55 @@ class Car:
             self.esp.SendRequest()
 
     def DistTo(self, x, y):
-        dx = x - self.x
-        dy = y - self.y 
-        return np.sqrt(dx**2 + dy**2)
+        return DistAB(self.x, self.y, x, y)
+
+
+
+        
+        
+
+        
+    def Move2(self, target_x, target_y, target_dir):
+        CLOSE_DIST =  100#mm
+        TARGET_LINE_WIDTH = 10
+        BACKUP_DIST = LENGTH #mm
+
+        #cartesian numbers
+        dx = target_x - self.x
+        dy = target_y - self.y
+        dist_to_target = DistAB(self.x, self.y, target_x, target_y)
+        dist_to_target_line = Cross(dx, -dy, np.cos(target_dir), -np.sin(target_dir)) #normal distance from target line to point pi/2 clockwise from target_dir
+
+        #angles
+        dtheta = Normalise(target_dir - self.dir)
+
+        # -1 to 1
+        car_alignment = AngleAlignment(self.dir, target_dir) # 1 if aligned, 0 if perpendicular, -1 if facing reverse
+        wheel_alignment = AngleAlignment(Normalise(self.dir + self.wheel_dir), target_dir) # 1 if aligned, 0 if perpendicular, -1 if facing reverse
+
+        # pseudo booleans
+        left_of_line = 1 if dist_to_target_line > 0 else -1
+        
+        if self.movement_state == "TRACKING_LINE":
+
+            overshot = 1 if car_alignment > 0 else -1
+            pass
+
+        elif self.movement_state == "TURNING":
+            pass
+
+        elif self.movement_state == "BACKING_UP":
+            pass
+        
+
+        #new stuff
+        turning_point_n = REAL_TURNING_RADIUS(1+np.cos(dtheta))
+        turning_point_t = turning_point_n / np.tan(dtheta)
+
+        intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
+        turning_point_x = intersection_point_x - turning_point_n * np.cos(target_dir) - turning_point_t * np.sin(target_dir)
+        turning_point_y = intersection_point_y - turning_point_n * np.sin(target_dir) - turning_point_t * np.cos(target_dir)
+
 
 
 
@@ -213,9 +297,9 @@ class Car:
         dy = (target_y - self.y)
         
         dist_to_target = self.DistTo(target_x, target_y)
-        dist_to_target_line = Cross(dx, dy, np.cos(target_dir), -np.sin(target_dir))
+        dist_to_target_line = Cross(dx, -dy, np.cos(target_dir), -np.sin(target_dir))
         out_of_lineness = abs(dist_to_target_line)/dist_to_target # 1 if the path we need to take to get to the target is along the line, 0 if we are far away or we are parallel with the end point
-        angle_alignment = -Dot(dx /  dist_to_target, dy / dist_to_target, np.cos(target_dir), -np.sin(target_dir)) # 1 if the path to the target and the target direction align, 0 if we are approaching from the side. -1 if we are facing the opposite way.
+        angle_alignment = -Dot(dx /  dist_to_target, -dy / dist_to_target, np.cos(target_dir), -np.sin(target_dir)) # 1 if the path to the target and the target direction align, 0 if we are approaching from the side. -1 if we are facing the opposite way.
 
         path_dir = np.atan2(-dy, dx) 
         self_dir = self.dir
@@ -229,24 +313,22 @@ class Car:
 
         closeness = (min(1, max(0.01, (CLOSE_DIST - dist_to_target) / CLOSE_DIST))**5)
         print(f"closeness: {closeness}")
-        side = np.sign(dist_to_target_line)
-        if side == 0: side = 1
-        facing = np.sign(dtheta_wheels_target) * side
-        if facing == 0: facing = 1
-        forwards = np.sign(self.speed)
-        if forwards == 0: forwards = 1
-        overshot = np.sign(angle_alignment) > 0
+        left = 1 if dist_to_target_line > 0 else -1
+        wheels_aligned = 1 if dtheta_wheels_target > 0 else -1
+        forwards = 1 if self.speed > 0 else -1
+        moving_towards_line = wheels_aligned * forwards
+        overshot = 1 if angle_alignment > 0 else -1
 
-        leaving_target_line = abs(dist_to_target_line) * facing * forwards > TARGET_LINE_WIDTH / 2
+        leaving_target_line = abs(dist_to_target_line) * moving_towards_line > TARGET_LINE_WIDTH / 2
 
-        print(f"leaving: {leaving_target_line}\nside: {side}\nfacing: {facing}\nforwards: {forwards}\novershot: {overshot}")
+        print(f"leaving: {leaving_target_line}\nmoving towards: {moving_towards_line}\nside: {left}\nfacing: {wheels_aligned}\nforwards: {forwards}\novershot: {overshot}")
 
         target_speed = min(MAX_SPEED, np.sqrt(2*ACCELERATION_LIMIT * dist_to_target)) * forwards
         if abs(dtheta_target) > 0.05 and dist_to_target_line > TARGET_LINE_WIDTH:
             target_wheel_dir = dtheta_wheels_target * 1.6 * forwards
         else:
             target_wheel_dir = dtheta_path * forwards#+ dtheta_target * (1-(closeness)) * (forwards + 1) /2
-        if dist_to_target_line * side < TARGET_LINE_WIDTH / 3:
+        if dist_to_target_line * left < TARGET_LINE_WIDTH / 3:
             print(f"dtheta_target = {dtheta_target}\n angle alignment: {angle_alignment}")
             if forwards == -1:
                 target_wheel_dir = np.sign(target_wheel_dir) * self.max_wheel_dir
