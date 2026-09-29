@@ -87,14 +87,14 @@ class PID(Sensor):
 
     def SenseSimDist(self, arena):
         img = arena.img
-        print(f"Current Sensor location: {self.x}, {self.y}")
+        #print(f"Current Sensor location: {self.x}, {self.y}")
         (x, y) = self.FindRayIntercept(img, 0)
         dx = x - self.x
         dy = y - self.y
         dist = np.sqrt(dx**2 + dy**2)
         if dist > 300:
                 dist = 300
-        print(f"sensor dists: x{dx} y{dy} dist{dist}")
+        #print(f"sensor dists: x{dx} y{dy} dist{dist}")
         return dist
 
     def FindHitData(self, code_arena):
