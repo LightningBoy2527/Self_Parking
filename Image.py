@@ -36,11 +36,12 @@ def SenseRealColour(angle_r):
     #translate from +/- pi to angle_d
     #if angle_r is less than zero, do 90 - angle_r
     if angle_r < 0:
-        angle_d = 90 - angle_r*180/np.pi
+        angle_d = VIEW_ANGLE_D/2 - angle_r*180/np.pi
     else:
-        angle_d = 90 + angle_r*180/np.pi
+        angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
    
     #read image from file
+    print("reading image")
     image = ReadImage()
     
     try:

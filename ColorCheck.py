@@ -20,8 +20,8 @@ valRange = 60 #range for value
 CAMERA_VIEW_ANGLE = 120 #total camera view angle
 START_SCAN_ANGLE = 120 - 90 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
-BLOCK_WIDTH = 10 #width of start scan colour avg blocks
-SCAN_THICKNESS = 15  #vertical height of our scan band (both normal scans and start scan)
+BLOCK_WIDTH = 8 #width of start scan colour avg blocks
+SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
 #begin function
 #scans the two colours stores in global  colours
 def ScanStart(image):
@@ -47,7 +47,7 @@ def ScanStart(image):
         #the two blocks are at center height, in th middle with 200 pixels beween each block
         #get the two blocks and average their h,s,v values
         block1 = image[halfheight-SCAN_THICKNESS :halfheight+SCAN_THICKNESS, scan_angle-BLOCK_WIDTH-BLOCK_SEPARATION:scan_angle-BLOCK_SEPARATION]
-        cv.imshow('block 1: ', block1)
+        #cv.imshow('block 1: ', block1)
         block1 = cv.cvtColor(block1, cv.COLOR_BGR2HSV)
         myHue1 = int(np.mean(block1[:,:, 0]))
         mySat1 = int(np.mean(block1[:,:, 1]))
@@ -55,7 +55,7 @@ def ScanStart(image):
         real_color1 = [myHue1, mySat1, myVal1]
         
         block2 = image[halfheight-SCAN_THICKNESS:halfheight+SCAN_THICKNESS, scan_angle+BLOCK_SEPARATION:scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION]
-        cv.imshow('block 2: ', block2)
+        #cv.imshow('block 2: ', block2)
         block2 = cv.cvtColor(block2, cv.COLOR_BGR2HSV)
         myHue2 = int(np.mean(block2[:,:, 0]))
         mySat2 = int(np.mean(block2[:,:, 1]))

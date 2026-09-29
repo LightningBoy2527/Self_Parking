@@ -93,7 +93,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
 
 
 seed = 3
-real = False
+real = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")

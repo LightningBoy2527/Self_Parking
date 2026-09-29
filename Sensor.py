@@ -71,11 +71,14 @@ class Camera(Sensor):
     
     def CameraOn(self, is_on):
         if is_on:
-            camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
-            cv.waitKey(100)
+            #camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
+            for i in range(10, 0, -1):
+                print (i)
+                cv.waitKey(1000)
             ColourCheck.ScanStart(Image.ReadImage())
         else:
-            camera_subprocess.kill()
+            #camera_subprocess.kill()
+            pass
 
     def SenseRealColour(self, ray_angle):
         Image.SenseRealColour(ray_angle)

@@ -7,7 +7,7 @@ import multiprocessing.shared_memory as shared
 
 cameraURL = "http://tacacam.local"
 
-targetFPS = 10
+targetFPS = 20
 
 frameInt = 1.0/targetFPS #1 second (to translate fps)
 
@@ -28,7 +28,7 @@ def ConfigureCamera():
     #only sets frame size atm
     print("\nconfiguring ESP-32 CAM...")
     try:
-        setCameraSettings("framesize", 3) #176x144
+        setCameraSettings("framesize", 0) #0#96x96 3#176x144
         setCameraSettings("brightness", -2)
         setCameraSettings("contrast", 0)
         setCameraSettings("saturation", 3)
