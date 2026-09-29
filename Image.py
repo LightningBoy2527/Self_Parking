@@ -26,7 +26,7 @@ def ReadImage():
         exception_type, exception_object, traceback = sys.exc_info()
         line = traceback.tb_lineno
         print("Error in ReadImage", e, "at ", line)
-        return 0 #prev_img
+        return prev_img
     
 #Method: slice an input image into the thin stip
 #divide the input pixels into 120 degrees by using .shape
@@ -65,7 +65,7 @@ def SenseRealColour(angle_r):
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
         if Colours.CheckForCar(image_slice, np.array([200, 200, 70]), np.array([0, 0, 0])):
-            return np.array([0, 0, 0]) #return ideal black
+            return (0, 0, 0) #return ideal black
         else:
             result = Colours.CheckColours(image_slice)
             return result

@@ -285,7 +285,7 @@ class Car:
 
         for angle in self.camera_rays:
             if real:
-                self.colour_data[angle] = self.camera.SenseRealColour()
+                self.colour_data[angle] = self.camera.SenseRealColour(angle)
             else:
                 self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
             if self.colour_data[angle] is not None:

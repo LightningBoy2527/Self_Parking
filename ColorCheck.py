@@ -185,14 +185,14 @@ def CheckColours(image):
         b = CheckColour(hsv, upperColor2, lowerColor2)
         
         if (a):
-            return real_color1 #there is a colour in that range of colour 1
+            return tuple(real_color1) #there is a colour in that range of colour 1
         elif (b): 
-            return real_color2 #there is a colour in that range of colour 2
+            return tuple(real_color2) #there is a colour in that range of colour 2
         else:
-            return np.array([181, 228, 255]) #brown? what colour if wall
+            return (181, 228, 255) #brown? what colour if wall
     except Exception as e:
         print("ERROR in CheckColours: ", e)
-        return np.array([181, 228, 255])
+        return (181, 228, 255)
 
 
 def CheckForCar(image, upperBlack, lowerBlack):

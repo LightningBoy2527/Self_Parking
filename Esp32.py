@@ -35,7 +35,7 @@ class Esp32:
             }
             print(request_headers)
             #Send an http post request with headers containing information
-            response = requests.post(IP + "/", headers=request_headers, timeout=0.5) #the / means the main get, top file directory
+            response = requests.post(IP + "/", headers=request_headers, timeout=3) #the / means the main get, top file directory
             #process the response
             content_type = response.headers.get("Response-Type")
             content = response.content.decode(encoding = "utf-8")
