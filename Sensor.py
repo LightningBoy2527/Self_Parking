@@ -61,7 +61,6 @@ class Sensor:
         return (finalX, finalY)
 
 
-
 class Camera(Sensor):
     def SenseSimColour(self, arena, ray_angle):
             img = arena.img
@@ -69,11 +68,11 @@ class Camera(Sensor):
             colour = tuple(int(c) for c in img[y + Arena.BORDER_WIDTH, x + Arena.BORDER_WIDTH])
             #print(f"{colour} at {x}, {y}")
             return colour
-        
-    def CameraOn(bool):
-        if bool:
+    
+    def CameraOn(self, is_on):
+        if is_on:
             camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
-            cv.waitKey(1000)
+            cv.waitKey(100)
             ColourCheck.ScanStart(Image.ReadImage())
         else:
             camera_subprocess.kill()

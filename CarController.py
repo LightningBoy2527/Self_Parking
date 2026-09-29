@@ -93,7 +93,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
 
 
 seed = 3
-real = False
+real = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
@@ -102,7 +102,7 @@ while True:
     (x, y) = arena.start_pos
     car = Car.Car(x, y, 0.03)        
     if real:
-        car.camera.CameraOn(True)
+        car.camera.CameraOn(is_on = True)
     #RunManually(arena, generated_arena, car, real)
     
    
@@ -111,5 +111,6 @@ while True:
         break
     else:
         seed = seed + 1
-
-car.camera.CameraOn(False)
+        
+    if real:
+        car.camera.CameraOn(is_on = False)
