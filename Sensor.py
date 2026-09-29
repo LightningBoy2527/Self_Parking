@@ -4,6 +4,7 @@ import ColorCheck as ColourCheck
 import Image
 import subprocess
 import sys
+import cv2 as cv
 
 class Sensor:
     def __init__(self, x, y, dir, parent):
@@ -72,11 +73,10 @@ class Camera(Sensor):
     def CameraOn(bool):
         if bool:
             camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
+            cv.waitKey(1000)
+            ColourCheck.ScanStart(Image.ReadImage())
         else:
             camera_subprocess.kill()
-            
-    def InitialiseReal(self):
-        ColourCheck.ScanStart(Image.ReadImage())
 
     def SenseRealColour(self, ray_angle):
         Image.SenseRealColour(ray_angle)

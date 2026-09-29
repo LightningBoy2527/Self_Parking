@@ -105,6 +105,8 @@ class Car:
 
         self.camera = Camera(LENGTH - 10, 10, DIRECTIONS["RIGHT"], self)
 
+
+
         self.camera_rays = (
             np.pi/5,
             np.pi/6,
@@ -270,6 +272,7 @@ class Car:
             pass
 
         elif self.movement_state == "TURNING":
+
             pass
 
         elif self.movement_state == "BACKING_UP":

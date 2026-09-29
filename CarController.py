@@ -93,18 +93,23 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
 
 
 seed = 3
+real = False
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
     code_arena = Arena.Arena(COLOURS, "CODE")
     arena = Arena.Arena(COLOURS)
     (x, y) = arena.start_pos
-    car = Car.Car(x, y, 0.03)
-    #RunManually(arena, generated_arena, car, True)
+    car = Car.Car(x, y, 0.03)        
+    if real:
+        car.camera.CameraOn(True)
+    #RunManually(arena, generated_arena, car, real)
     
    
-    RunAutonomously(arena, generated_arena, code_arena, car, False)
+    RunAutonomously(arena, generated_arena, code_arena, car, real)
     if cv.waitKey(0) != ord('r'):
         break
     else:
         seed = seed + 1
+
+car.camera.CameraOn(False)
