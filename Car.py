@@ -286,7 +286,7 @@ class Car:
             target_wheel_dir = dtheta * line_alignment + (1 - line_alignment) * self.max_wheel_dir * left_of_line
 
             turning_point_n = REAL_TURNING_RADIUS * (1+np.cos(dtheta))
-            turning_point_t = turning_point_n / np.tan(dtheta)
+            turning_point_t = turning_point_n / np.tan(dtheta) if np.tan(dtheta) != 0 else 0
             intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
 
             if intersection_point_x is not None:

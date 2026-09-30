@@ -49,7 +49,7 @@ class Esp32:
             distances = dict(zip(type_array, content_array))
             if len(distances) > 0:
                 for sensor in distances.keys():
-                    self.sensors[sensor].last_sensed = distances[sensor]
+                    self.sensors[sensor].last_sensed = float(distances[sensor])
             return
         except Exception as e:
             print("Error: ", e)
