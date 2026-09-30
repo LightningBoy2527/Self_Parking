@@ -52,7 +52,7 @@ def RunManually(arena, generated_arena, car, real):
         #     RealCar.Turn(steer)
         car.Turn(steer)
         car.Drive(throttle)
-        car.Move(real)
+        car.Move(real, arena)
         car.Draw(displayArena)
         car.Draw(sensedArena)
         cv.imshow("preview", displayArena)
@@ -72,7 +72,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real):
         
         displayArena = generated_arena.img.copy()
         sensedArena = arena.img.copy()
-        car.Move(real)
+        car.Move(real, arena)
         car.Draw(displayArena) 
         car.Draw(sensedArena)
         try:

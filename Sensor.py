@@ -62,9 +62,9 @@ class Sensor:
 
 
 class Camera(Sensor):
-    def __init__(self, x, y, dir, parent, initial_img):
+    def __init__(self, x, y, dir, parent):
             super().__init__(x, y, dir, parent)
-            self.last_img = initial_img
+            self.last_img = Image.ReadImage()
 
     def CurrentImage(self):
         return self.last_img

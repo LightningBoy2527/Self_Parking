@@ -225,7 +225,7 @@ class Car:
             self.y = self.y - abs_y_center_movement
             self.dir = self.dir + np.arctan2(rel_y_wheel_movement, self.wheelbase)
 
-    def Move(self, real):
+    def Move(self, real, arena):
         inst_speed = self.PerSecondToPerCycle(self.speed)
         self.x = self.x + inst_speed * np.cos(self.dir - self.wheel_dir/2)
         self.y = self.y - inst_speed * np.sin(self.dir - self.wheel_dir/2)
@@ -234,7 +234,7 @@ class Car:
         if real:
             self.esp.SetTurningAngle(self.wheel_dir)
             self.esp.SetMotorSpeed(self.speed)
-            self.esp.SendRequest()
+            self.esp.SendRequest(arena)
 
     def DistTo(self, x, y):
         return DistAB(self.x, self.y, x, y)
@@ -321,7 +321,7 @@ class Car:
             
 
             turning_point_n = REAL_TURNING_RADIUS * (1+np.cos(dtheta))
-            turning_point_t = turning_point_n / np.tan(dtheta)
+            turning_point_t = turning_point_n / np.tan(dtheta) if np.tan(dtheta) != 0 else 0
             intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
             print(f"overshot turning point: {self.HasOvershot(intersection_point_x, intersection_point_y, self.dir)}, overshot target: {self.HasOvershot(target_x, target_y, target_dir)}")
             if not self.HasOvershot(intersection_point_x, intersection_point_y, self.dir) and not self.HasOvershot(target_x, target_y, target_dir) and dist_to_target > BACKUP_DIST:
@@ -347,7 +347,7 @@ class Car:
                 self.distance_data[sensor] = sensor.SenseSimDist(generated_arena)
             self.hit_data[sensor] = sensor.FindHitData(code_arena)
 
-        self.LocateOnTrack(code_arena)
+        self.LocateOnTrack()
 
         if real:
             self.camera.UpdateImage()
@@ -404,7 +404,7 @@ class Car:
         #print(f"Dist to: {self.DistTo(self.target_x, self.target_y)}")
         #print(f"location: {self.x}, {self.y}")
 
-    def LocateOnTrack(self, code_arena):
+    def LocateOnTrack(self):
         x_guess = self.x
         y_guess = self.y
         dir_guess = self.dir
@@ -477,9 +477,10 @@ class Car:
             print(dir_guesses)
             dir_guess = np.median(dir_guesses)
         
-            
-        print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
-        (self.x, self.y, self.dir) = (x_guess, y_guess, dir_guess)
+        if self.DistTo(x_guess, y_guess) < 50 and abs(Normalise(dir_guess - self.dir)) < np.pi/10:
+
+            print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
+            (self.x, self.y, self.dir) = (x_guess, y_guess, dir_guess)
 
     def PointInRect(self, x, y, rect):
         if rect.pt1[0] <= x and rect.pt2[0] >= x and rect.pt1[1] <= y and rect.pt2[1] >= y:
