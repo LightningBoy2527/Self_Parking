@@ -4,6 +4,7 @@ import Arena
 import numpy as np
 import cv2 as cv
 from pydualsense import pydualsense
+import RunManually
 
 COLOURS = { #BGR
     "RED": (0, 0, 255),
@@ -37,30 +38,30 @@ def FindControllerXY(ds):
     return (car_lr, car_fb)
 
 
-def RunManually(arena, generated_arena, car, real):
-    ds = pydualsense() # open controller
-    ds.init() # initialize controller
-    ds.light.setColorI(80,0,255) # set touchpad color to purple
+# def RunManually(arena, generated_arena, car, real):
+#     ds = pydualsense() # open controller
+#     ds.init() # initialize controller
+#     ds.light.setColorI(80,0,255) # set touchpad color to purple
 
-    while (True):
-        car.UpdateClockDiff()
-        displayArena = generated_arena.img.copy()
-        sensedArena = arena.img.copy()
-        (steer, throttle) = FindControllerXY(ds)
-        # if real:
-        #     RealCar.Drive(throttle)
-        #     RealCar.Turn(steer)
-        car.Turn(steer)
-        car.Drive(throttle)
-        car.Move(real, arena)
-        car.Draw(displayArena)
-        car.Draw(sensedArena)
-        cv.imshow("preview", displayArena)
-        cv.imshow("sensed", sensedArena)
-        if cv.waitKey(1) == ord('q') or ds.state.cross:
-            break
+#     while (True):
+#         car.UpdateClockDiff()
+#         displayArena = generated_arena.img.copy()
+#         sensedArena = arena.img.copy()
+#         (steer, throttle) = FindControllerXY(ds)
+#         # if real:
+#         #     RealCar.Drive(throttle)
+#         #     RealCar.Turn(steer)
+#         car.Turn(steer)
+#         car.Drive(throttle)
+#         car.Move(real, arena)
+#         car.Draw(displayArena)
+#         car.Draw(sensedArena)
+#         cv.imshow("preview", displayArena)
+#         cv.imshow("sensed", sensedArena)
+#         if cv.waitKey(1) == ord('q') or ds.state.cross:
+#             break
 
-    return
+#     return
 
 
 
@@ -103,7 +104,7 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
 
 seed = 3
 real = True
-auto = True
+auto = False
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
@@ -113,6 +114,8 @@ while True:
     car = Car.Car(x, y, 0.03)        
     if real:
         car.camera.CameraOn(is_on = True)
+    if not auto:
+        RunManually.StartController()
     #RunManually(arena, generated_arena, car, real)
     
    
