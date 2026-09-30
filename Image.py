@@ -65,7 +65,8 @@ def SenseRealColour(angle_r, image):
         
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
-        if Colours.CheckForCar(image_slice, np.array([200, 200, 70]), np.array([0, 0, 0])):
+        if Colours.CheckForCar(image_slice, np.array([255, 255, 40]), np.array([0, 0, 0])):
+            print("car")
             return (0, 0, 0) #return ideal black
         else:
             result = Colours.CheckColours(image_slice)
@@ -80,6 +81,7 @@ def SenseRealColour(angle_r, image):
 def DrawStartRectangles(image):
     START_SCAN_ANGLE = Colours.START_SCAN_ANGLE
     CAMERA_VIEW_ANGLE = Colours.CAMERA_VIEW_ANGLE
+    
     BLOCK_SEPARATION = Colours.BLOCK_SEPARATION
     BLOCK_WIDTH = Colours.BLOCK_WIDTH
     SCAN_THICKNESS = Colours.SCAN_THICKNESS

@@ -168,6 +168,7 @@ def CheckColour(hsv, upperCo, lowerCo):
 #checks both colours in image
 def CheckColours(image):
     try:
+        #print("in Checkcolours")
         global upperColor1
         global lowerColor1
         global upperColor2

@@ -87,7 +87,7 @@ class Camera(Sensor):
             pass
 
     def SenseRealColour(self, ray_angle):
-        Image.SenseRealColour(ray_angle, self.last_img)
+        return Image.SenseRealColour(ray_angle, self.last_img)
 
 class PID(Sensor):
     def __init__(self, x, y, dir, parent, initial_sense):
