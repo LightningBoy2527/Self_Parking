@@ -2,7 +2,7 @@ import numpy as np
 import Car
 import requests
 
-IP = "http://tacacar.local"
+IP = "http://10.42.0.58"
 
 class Esp32:
     def __init__(self, connectioninfo, parent, sensors):

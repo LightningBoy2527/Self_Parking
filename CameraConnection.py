@@ -5,9 +5,9 @@ import time
 import multiprocessing.shared_memory as shared
 #import asyncio
 
-cameraURL = "http://tacacam.local"
+cameraURL = "http://10.42.0.17"
 
-targetFPS = 20
+targetFPS = 5
 
 frameInt = 1.0/targetFPS #1 second (to translate fps)
 
@@ -79,7 +79,8 @@ def main():
             frameCount = 0
             fpsStartTime = captureEnd
         cv.imwrite("ESPCamera.bmp", frame)
-        cv.waitKey(1)
+        if cv.waitKey(1) == ord('q'):
+            break
         nextCaptureTime += frameInt
         if nextCaptureTime < time.perf_counter():
             nextCaptureTime = time.perf_counter()

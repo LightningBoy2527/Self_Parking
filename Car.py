@@ -20,8 +20,8 @@ REAR_AXLE_POS = 20 #mm
 WHEEL_INSET = 20 #mm
 STEERING_AXLE_OFFSET = 8 #mm
 STEERING_SPEED = 2 #rad/sec
-MAX_SPEED = 60.0 #mm/sec
-ACCELERATION_LIMIT = 600 #mm/sec^2
+MAX_SPEED = 20.0 #mm/sec
+ACCELERATION_LIMIT = 60 #mm/sec^2
 DRAG = 0.96
 BACK_SENSOR_OFFSET = 20 #mm, distance from centerline of car to back sensors
 SIDE_SENSOR_OFFSET = 50 #mm, distance from centerline of car to side sensors
@@ -347,7 +347,7 @@ class Car:
                 self.distance_data[sensor] = sensor.SenseSimDist(generated_arena)
             self.hit_data[sensor] = sensor.FindHitData(code_arena)
 
-        #self.LocateOnTrack(code_arena)
+        self.LocateOnTrack(code_arena)
 
         for angle in self.camera_rays:
             if real:
