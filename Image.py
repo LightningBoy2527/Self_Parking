@@ -32,7 +32,7 @@ def ReadImage():
 #divide the input pixels into 120 degrees by using .shape
 #get the desired pixels
 #output idealized color depending on avg pixel
-def SenseRealColour(angle_r):
+def SenseRealColour(angle_r, image):
     #translate from +/- pi to angle_d
     #if angle_r is less than zero, do 90 - angle_r
     if angle_r < 0:
@@ -42,7 +42,7 @@ def SenseRealColour(angle_r):
    
     #read image from file
     print("reading image")
-    image = ReadImage()
+    #image = ReadImage()
     
     try:
         #get image size

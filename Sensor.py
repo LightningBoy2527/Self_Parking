@@ -62,6 +62,16 @@ class Sensor:
 
 
 class Camera(Sensor):
+    def __init__(self, x, y, dir, parent, initial_img):
+            super().__init__(x, y, dir, parent)
+            self.last_img = initial_img
+
+    def CurrentImage(self):
+        return self.last_img
+    
+    def UpdateImage(self):
+        Image.ReadImage()
+        
     def SenseSimColour(self, arena, ray_angle):
             img = arena.img
             (x, y) = self.FindRayIntercept(img, ray_angle)
@@ -81,7 +91,7 @@ class Camera(Sensor):
             pass
 
     def SenseRealColour(self, ray_angle):
-        Image.SenseRealColour(ray_angle)
+        Image.SenseRealColour(ray_angle, self.last_img)
 
 class PID(Sensor):
     def __init__(self, x, y, dir, parent, initial_sense):
