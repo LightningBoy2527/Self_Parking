@@ -338,7 +338,7 @@ class Car:
 
 
 
-    def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real):
+    def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real, moving):
 
         for sensor in self.esp.sensors.values():
             if real:
@@ -358,7 +358,11 @@ class Car:
                 self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
             if self.colour_data[angle] is not None:
                 self.InterpretCameraData(arena, angle, self.colour_data[angle], ignored_colours)
-            
+        
+        if not moving:
+             #print(self.state, self.movement_state)
+             return
+         
         if self.state == "FINDING_START_COLOURS":
             self.MoveTo(self.target_x, self.target_y, 0)
                

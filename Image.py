@@ -60,7 +60,7 @@ def SenseRealColour(angle_r, image):
         
         #take a slice of input image that is in the area ww want
         image_slice = image[lower_height:upper_height, left_edge:right_edge]
-        cv.imshow("my tiny slice", image_slice)
+        #cv.imshow("my tiny slice", image_slice)
         
         
         #using CarLogicCamera

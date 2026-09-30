@@ -64,11 +64,11 @@ def RunManually(arena, generated_arena, car, real):
 
 
 
-def RunAutonomously(arena, generated_arena, code_arena, car, real):
+def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
     car.state = "FINDING_START_COLOURS"
     while (car.state != "DONE"):
         car.UpdateClockDiff()
-        car.DoAutomation(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real)
+        car.DoAutomation(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real, moving)
         
         displayArena = generated_arena.img.copy()
         sensedArena = arena.img.copy()
@@ -106,7 +106,7 @@ while True:
     #RunManually(arena, generated_arena, car, real)
     
    
-    RunAutonomously(arena, generated_arena, code_arena, car, real)
+    RunAutonomously(arena, generated_arena, code_arena, car, False, False)
     if cv.waitKey(0) != ord('r'):
         break
     else:
