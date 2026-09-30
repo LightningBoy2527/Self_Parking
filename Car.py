@@ -510,6 +510,7 @@ class Car:
             return False
 
     def InterpretCameraData(self, arena, angle, colour, ignored_colours):
+        print(f"colour observed: {colour} at angle {angle}")
         if colour != Arena.PARKED_CAR_COLOUR:
             while np.array_equal(self.camera.SenseSimColour(arena, angle), Arena.PARKED_CAR_COLOUR): 
                 (x, y) = self.camera.FindRayIntercept(arena.img, angle)
@@ -518,10 +519,9 @@ class Car:
                     if self.PointInRect(x ,y, car_rect):
                         car_rect.colour = None  
                         car_rect.Draw(arena.img)
-
+        
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
         if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
-            print(f"colour observed: {colour}")
             for rect in (arena.start_rects):
                 if self.PointInRect(x, y, rect):
                     rect.colour = colour
