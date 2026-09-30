@@ -93,7 +93,8 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
 
 
 seed = 3
-real = True
+real = False
+moving = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
@@ -106,7 +107,7 @@ while True:
     #RunManually(arena, generated_arena, car, real)
     
    
-    RunAutonomously(arena, generated_arena, code_arena, car, False, False)
+    RunAutonomously(arena, generated_arena, code_arena, car, real, moving)
     if cv.waitKey(0) != ord('r'):
         break
     else:

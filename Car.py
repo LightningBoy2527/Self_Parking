@@ -323,11 +323,12 @@ class Car:
             turning_point_n = REAL_TURNING_RADIUS * (1+np.cos(dtheta))
             turning_point_t = turning_point_n / np.tan(dtheta) if np.tan(dtheta) != 0 else 0
             intersection_point_x, intersection_point_y = FindIntersection(self.x, self.y, self.dir, target_x, target_y, target_dir)
-            print(f"overshot turning point: {self.HasOvershot(intersection_point_x, intersection_point_y, self.dir)}, overshot target: {self.HasOvershot(target_x, target_y, target_dir)}")
-            if not self.HasOvershot(intersection_point_x, intersection_point_y, self.dir) and not self.HasOvershot(target_x, target_y, target_dir) and dist_to_target > BACKUP_DIST:
-                self.movement_state = "TURNING"
-                target_speed = MAX_SPEED
-                target_wheel_dir = self.max_wheel_dir * left_of_line
+            if intersection_point_x is not None:
+                print(f"overshot turning point: {self.HasOvershot(intersection_point_x, intersection_point_y, self.dir)}, overshot target: {self.HasOvershot(target_x, target_y, target_dir)}")
+                if not self.HasOvershot(intersection_point_x, intersection_point_y, self.dir) and not self.HasOvershot(target_x, target_y, target_dir) and dist_to_target > BACKUP_DIST:
+                    self.movement_state = "TURNING"
+                    target_speed = MAX_SPEED
+                    target_wheel_dir = self.max_wheel_dir * left_of_line
 
         print(f"target speed: {target_speed} target turning angle: {target_wheel_dir}")
         self.Turn(target_wheel_dir)
@@ -429,8 +430,9 @@ class Car:
             if hit[1] is not None:
                 y_guesses[sensor] = hit[1] + (self.y - sensor.y) + dist * np.sin(sensor.dir)
                 hit_1d[sensor] = hit[1]
-
         
+        x_guesses = {sensor: val for sensor, val in x_guesses.items() if np.isfinite(val)}
+        y_guesses = {sensor: val for sensor, val in y_guesses.items() if np.isfinite(val)}
 
         if len(x_guesses) > 0:
             x_guess = np.median(list(x_guesses.values()))
@@ -476,15 +478,30 @@ class Car:
                                     (self.distance_data[sensor1] + self.distance_data[sensor2] + DistBetweenSensors(sensor1, sensor2))
                                 )
                             )
+        NonNaNSubset = lambda arr: [item for item in arr if np.isfinite(item)]
+        
+        dir_guesses = NonNaNSubset(dir_guesses)
 
         if len(dir_guesses) > 0:
             print(dir_guesses)
             dir_guess = np.median(dir_guesses)
+
+        newCarRect = Arena.RotatedRect((x_guess, y_guess), (LENGTH, WIDTH), -180/np.pi * dir_guess, COLOUR)
+        (min_x, min_y, max_x, max_y) = newCarRect.BoundsXY()
+
+        in_bounds = min_x >0 and min_y > 0 and max_x < Arena.TOTAL_WIDTH and max_y < Arena.TOTAL_HEIGHT
         
-        if self.DistTo(x_guess, y_guess) < 50 and abs(Normalise(dir_guess - self.dir)) < np.pi/10:
+        if self.DistTo(x_guess, y_guess) < 50 and abs(Normalise(dir_guess - self.dir)) < np.pi/10 and in_bounds:
 
             print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
-            (self.x, self.y, self.dir) = (x_guess, y_guess, dir_guess)
+            if len(x_guesses) > 0:
+                self.x = x_guess
+
+            if len(y_guesses) > 0:
+                self.y = y_guess
+
+            if len(dir_guesses) > 0:
+                self.dir = dir_guess
 
     def PointInRect(self, x, y, rect):
         if rect.pt1[0] <= x and rect.pt2[0] >= x and rect.pt1[1] <= y and rect.pt2[1] >= y:

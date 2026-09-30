@@ -174,6 +174,16 @@ class RotatedRect:
         self.angle = angle
         self.colour = colour
 
+    def BoundsXY(self):
+        points = cv.boxPoints((self.center, self.dimensions, self.angle))
+        x_vals = [point[0] for point in points]
+        y_vals = [point[1] for point in points]
+
+        x_vals.sort()
+        y_vals.sort()
+
+        return (x_vals[0], y_vals[0], x_vals[-1], y_vals[-1])
+
     def Draw(self, img):
         if self.colour is not None:
             colour = self.colour
