@@ -4,6 +4,7 @@ import numpy as np
 import cv2 as cv
 import Arena
 import time as time
+import RunManually
 
 
 WIDTH = 80 #mm
@@ -339,7 +340,7 @@ class Car:
 
 
 
-    def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real, moving):
+    def DoSensorsAndStates(self, generated_arena, code_arena, arena, ignored_colours, real, auto):
         WAYPOINT_TOLERANCE = 50 # mm
         for sensor in self.esp.sensors.values():
             if real:
@@ -360,8 +361,8 @@ class Car:
             if self.colour_data[angle] is not None:
                 self.InterpretCameraData(arena, angle, self.colour_data[angle], ignored_colours)
         
-        if not moving:
-             #print(self.state, self.movement_state)
+        if not auto:
+             RunManually.MoveManually()
              return
          
         if self.state == "FINDING_START_COLOURS":

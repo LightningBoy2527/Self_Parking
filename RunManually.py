@@ -45,3 +45,11 @@ def RunManually(arena, generated_arena, car, real):
             cv.imshow("preview", displayArena)
             cv.imshow("sensed", sensedArena)
 
+def MoveManually(car):
+    ds = pydualsense() # open controller
+    ds.init() # initialize controller
+    ds.light.setColorI(80,0,255) # set touchpad color to purple
+
+    (steer, throttle) = FindControllerXY(ds)
+    car.Turn(steer)
+    car.Drive(throttle)

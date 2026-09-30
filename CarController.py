@@ -64,7 +64,7 @@ def RunManually(arena, generated_arena, car, real):
 
 
 
-def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
+def RunCar(arena, generated_arena, code_arena, car, real, auto):
     car.state = "FINDING_START_COLOURS"
 
     #camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
@@ -77,7 +77,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
 
     while (car.state != "DONE"):
         car.UpdateClockDiff()
-        car.DoAutomation(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real, moving)
+        car.DoSensorsAndStates(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real, auto)
         
         displayArena = generated_arena.img.copy()
         sensedArena = arena.img.copy()
@@ -103,7 +103,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
 
 seed = 3
 real = True
-moving = True
+auto = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
@@ -116,7 +116,7 @@ while True:
     #RunManually(arena, generated_arena, car, real)
     
    
-    RunAutonomously(arena, generated_arena, code_arena, car, real, moving)
+    RunCar(arena, generated_arena, code_arena, car, real, auto)
     if cv.waitKey(0) != ord('r'):
         break
     else:
