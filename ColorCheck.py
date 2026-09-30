@@ -18,10 +18,11 @@ satRange = 60 #saturation range
 valRange = 60 #range for value
 
 CAMERA_VIEW_ANGLE = 120 #total camera view angle
-START_SCAN_ANGLE = 120 - 95 #ACW from 0 degrees
+START_SCAN_ANGLE = 120 - 100 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
+SCAN_HEIGHT = -10 #how far to offset scan from center height
 #begin function
 #scans the two colours stores in global  colours
 def ScanStart(image):

@@ -6,7 +6,7 @@ import ColorCheck as Colours
 #constants from Colours
 SCAN_THICKNESS = Colours.SCAN_THICKNESS
 VIEW_ANGLE_D = Colours.CAMERA_VIEW_ANGLE
-    
+SCAN_HEIGHT = Colours.SCAN_HEIGHT
 prev_img = np.array([]) #the previous image incase of read error
 
 def ReadImage():
@@ -49,8 +49,8 @@ def SenseRealColour(angle_r, image):
         height, width, channels = image.shape
         
         #more positive means lower down
-        lower_height = int(height/2 - SCAN_THICKNESS/2)
-        upper_height = int(height/2 + SCAN_THICKNESS/2)
+        lower_height = int(height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT)
+        upper_height = int(height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT)
         
         angle_d_step = width/VIEW_ANGLE_D
         #when writing this I assumed positive angle_d is cw
