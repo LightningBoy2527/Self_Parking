@@ -104,7 +104,7 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
 
 seed = 3
 real = True
-auto = False
+auto = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")

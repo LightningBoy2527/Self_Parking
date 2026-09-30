@@ -65,7 +65,7 @@ def SenseRealColour(angle_r, image):
         
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
-        if Colours.CheckForCar(image_slice, np.array([255, 255, 40]), np.array([0, 0, 0])):
+        if Colours.CheckForCar(image_slice, np.array([255, 255, 25]), np.array([0, 0, 0])):
             print("car")
             return (0, 0, 0) #return ideal black
         else:

@@ -22,7 +22,7 @@ START_SCAN_ANGLE = 120 - 100 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
-SCAN_HEIGHT = -10 #how far to offset scan from center height
+SCAN_HEIGHT = 10 #how far to offset scan from center height
 #begin function
 #scans the two colours stores in global  colours
 def ScanStart(image):
@@ -53,7 +53,7 @@ def ScanStart(image):
         myHue1 = int(np.mean(block1[:,:, 0]))
         mySat1 = int(np.mean(block1[:,:, 1]))
         myVal1 = int(np.mean(block1[:,:, 2]))
-        real_color1 = [myHue1, mySat1, myVal1]
+        real_color1 = np.array([myHue1, mySat1, myVal1])
         
         block2 = image[halfheight-SCAN_THICKNESS:halfheight+SCAN_THICKNESS, scan_angle+BLOCK_SEPARATION:scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION]
         #cv.imshow('block 2: ', block2)
@@ -61,7 +61,7 @@ def ScanStart(image):
         myHue2 = int(np.mean(block2[:,:, 0]))
         mySat2 = int(np.mean(block2[:,:, 1]))
         myVal2 = int(np.mean(block2[:,:, 2]))
-        real_color2 = [myHue2, mySat2, myVal2]
+        real_color2 = np.array([myHue2, mySat2, myVal2])
         if myHue1 + range >= 180:
             lowerHue1 = myHue1 - range
             upperHue1 = 180
