@@ -23,8 +23,8 @@ STEERING_SPEED = 2 #rad/sec
 MAX_SPEED = 20.0 #mm/sec
 ACCELERATION_LIMIT = 60 #mm/sec^2
 DRAG = 0.96
-BACK_SENSOR_OFFSET = 20 #mm, distance from centerline of car to back sensors
-SIDE_SENSOR_OFFSET = 50 #mm, distance from centerline of car to side sensors
+BACK_SENSOR_OFFSET = 12.5 #mm, distance from centerline of car to back sensors
+SIDE_SENSOR_OFFSET = 16.5 #mm, distance from centerline of car to side sensors
 
 DIRECTIONS = {
 "FRONT": 0,
