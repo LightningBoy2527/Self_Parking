@@ -349,6 +349,8 @@ class Car:
 
         self.LocateOnTrack(code_arena)
 
+        if real:
+            self.camera.UpdateImage()
         for angle in self.camera_rays:
             if real:
                 self.colour_data[angle] = self.camera.SenseRealColour(angle)
