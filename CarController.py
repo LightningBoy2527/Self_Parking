@@ -66,6 +66,15 @@ def RunManually(arena, generated_arena, car, real):
 
 def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
     car.state = "FINDING_START_COLOURS"
+
+    #camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
+    car.esp.SetMotorSpeed(0)
+    car.esp.SetTurningAngle(0)
+    for i in range(3, 0, -1):
+        print (i)
+        car.esp.SendRequest(arena)
+        cv.waitKey(1000)
+
     while (car.state != "DONE"):
         car.UpdateClockDiff()
         car.DoAutomation(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real, moving)
@@ -93,7 +102,7 @@ def RunAutonomously(arena, generated_arena, code_arena, car, real, moving):
 
 
 seed = 3
-real = False
+real = True
 moving = True
 while True:
     rng.seed(seed)

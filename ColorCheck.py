@@ -18,7 +18,7 @@ satRange = 60 #saturation range
 valRange = 60 #range for value
 
 CAMERA_VIEW_ANGLE = 120 #total camera view angle
-START_SCAN_ANGLE = 120 - 90 #ACW from 0 degrees
+START_SCAN_ANGLE = 120 - 95 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
@@ -185,8 +185,10 @@ def CheckColours(image):
         b = CheckColour(hsv, upperColor2, lowerColor2)
         
         if (a):
+            print(f"detected colour a: {real_color1}")
             return tuple(real_color1) #there is a colour in that range of colour 1
         elif (b): 
+            print(f"detected colour b: {real_color2}")
             return tuple(real_color2) #there is a colour in that range of colour 2
         else:
             return (181, 228, 255) #brown? what colour if wall

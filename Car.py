@@ -95,8 +95,8 @@ class Car:
         self.visited_colours = []
 
         self.sensors = { 
-            "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
-            "RIGHT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self, Arena.TRACK_WIDTH - WIDTH - Arena.START_OFFSET_Y),
+            "RIGHT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
+            "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self, Arena.TRACK_WIDTH - WIDTH - Arena.START_OFFSET_Y),
             "BACK1": PID(0, WIDTH/2 + BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
             "BACK2": PID(0, WIDTH/2 - BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
         }
@@ -340,7 +340,7 @@ class Car:
 
 
     def DoAutomation(self, generated_arena, code_arena, arena, ignored_colours, real, moving):
-
+        WAYPOINT_TOLERANCE = 50 # mm
         for sensor in self.esp.sensors.values():
             if real:
                 self.distance_data[sensor] = sensor.SenseRealDist()
@@ -371,20 +371,20 @@ class Car:
             print(self.DistTo(self.target_x,self.target_y))
             self.FindTarget(arena)
             self.MoveTo(self.target_x, self.target_y, 0)
-            if self.DistTo(self.target_x, self.target_y) < 3 and self.state == "SEARCHING_FOR_TARGET":
+            if self.DistTo(self.target_x, self.target_y) < WAYPOINT_TOLERANCE and self.state == "SEARCHING_FOR_TARGET":
                 self.state = "DONE"
                 
         elif self.state == "PREPARING_TO_PARK":
             self.FindTarget(arena)
             self.MoveTo(self.target_x, self.target_y, 0)
-            if self.DistTo(self.target_x, self.target_y) < 5:
+            if self.DistTo(self.target_x, self.target_y) < WAYPOINT_TOLERANCE:
                 self.state = "PARKING"
                 self.speed = 1
 
         elif self.state == "PARKING":
             self.FindTarget(arena)
             self.MoveTo(self.target_x, self.target_y, np.pi* 3 / 2)
-            if self.DistTo(self.target_x, self.target_y) < 3 and self.state == "PARKING": 
+            if self.DistTo(self.target_x, self.target_y) < WAYPOINT_TOLERANCE and self.state == "PARKING": 
                 self.state = "PARKED"
 
         elif self.state == "PARKED":
@@ -398,7 +398,7 @@ class Car:
 
         elif self.state == "REVERSING_OUT":
             self.MoveTo(self.target_x, self.target_y, 0)
-            if self.DistTo(self.target_x, self.target_y) < 5:
+            if self.DistTo(self.target_x, self.target_y) < WAYPOINT_TOLERANCE:
                 self.state = "SEARCHING_FOR_TARGET"
                 self.speed = 1
 
@@ -521,6 +521,7 @@ class Car:
 
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
         if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
+            print(f"colour observed: {colour}")
             for rect in (arena.start_rects):
                 if self.PointInRect(x, y, rect):
                     rect.colour = colour
