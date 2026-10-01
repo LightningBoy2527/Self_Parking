@@ -39,10 +39,6 @@ def SenseRealColour(angle_r, image):
     # else:
         
     angle_d = VIEW_ANGLE_D/2 - angle_r*180/np.pi
-   
-    #read image from file
-    print("reading image")
-    #image = ReadImage()
     
     try:
         #get image size
@@ -66,7 +62,7 @@ def SenseRealColour(angle_r, image):
         
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
-        if Colours.CheckForCar(image_slice, np.array([255, 255, 25]), np.array([0, 0, 0])):
+        if Colours.CheckForCar(image_slice, np.array([255, 255, 30]), np.array([0, 0, 0])):
             print("car")
             return (0, 0, 0) #return ideal black
         else:

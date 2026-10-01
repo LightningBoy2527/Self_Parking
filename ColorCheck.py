@@ -13,7 +13,7 @@ real_color2 = np.array([])
 lowerColor2 = np.array([])
 upperColor2 = np.array([])
 
-range = 15 #range for hue
+range = 8 #range for hue
 satRange = 60 #saturation range
 valRange = 60 #range for value
 
