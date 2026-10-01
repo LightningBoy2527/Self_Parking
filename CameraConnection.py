@@ -61,8 +61,11 @@ def main():
     #set up out interprocess global data
     #shared_space = shared.SharedMemory(name='camera_img', create=True, size=1000) #we create the shared memeory here
     
+    failedAttempts = 0
+
+
     #continuously run to capture frames
-    while True:
+    while failedAttempts < 5:
         #starts counting (outside of program)
         now = time.perf_counter()
         if  now < nextCaptureTime:
@@ -72,7 +75,10 @@ def main():
         if frame  is None:
             print("failed to capture frame")
             nextCaptureTime = time.perf_counter() + frameInt
+            failedAttempts += 1
             continue
+        else:
+            failedAttempts = 0
         frameCount += 1
         elapsed = captureEnd - fpsStartTime
         if elapsed >= 1.0:
@@ -84,5 +90,5 @@ def main():
         nextCaptureTime += frameInt
         if nextCaptureTime < time.perf_counter():
             nextCaptureTime = time.perf_counter()
-            
+    return
 main()        

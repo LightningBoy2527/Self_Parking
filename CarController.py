@@ -105,14 +105,14 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
 
 seed = 3
 real = True
-auto = False
+auto = True
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")
     code_arena = Arena.Arena(COLOURS, "CODE")
     arena = Arena.Arena(COLOURS)
     (x, y) = arena.start_pos
-    car = Car.Car(x, y, 0.03)        
+    car = Car.Car(x, y, 0.0)        
     if real:
         car.camera.CameraOn(is_on = True)
     if not auto:

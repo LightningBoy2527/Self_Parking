@@ -48,7 +48,7 @@ def ScanStart(image):
         #get the two blocks and average their h,s,v values
         block1 = image[halfheight-SCAN_THICKNESS :halfheight+SCAN_THICKNESS, scan_angle-BLOCK_WIDTH-BLOCK_SEPARATION:scan_angle-BLOCK_SEPARATION]
         block1 = cv.resize(block1, (200, 200), cv.INTER_CUBIC)
-        cv.imshow('block 1: ', block1)
+        #cv.imshow('block 1: ', block1)
         block1 = cv.cvtColor(block1, cv.COLOR_BGR2HSV)
         myHue1 = int(np.mean(block1[:,:, 0]))
         mySat1 = int(np.mean(block1[:,:, 1]))
@@ -57,7 +57,7 @@ def ScanStart(image):
         
         block2 = image[halfheight-SCAN_THICKNESS:halfheight+SCAN_THICKNESS, scan_angle+BLOCK_SEPARATION:scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION]
         block2 = cv.resize(block2, (200, 200), cv.INTER_CUBIC)
-        cv.imshow('block 2: ', block2)
+        #cv.imshow('block 2: ', block2)
         block2 = cv.cvtColor(block2, cv.COLOR_BGR2HSV)
         myHue2 = int(np.mean(block2[:,:, 0]))
         mySat2 = int(np.mean(block2[:,:, 1]))

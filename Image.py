@@ -38,7 +38,7 @@ def SenseRealColour(angle_r, image):
     #     angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
     # else:
         
-    angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
+    angle_d = VIEW_ANGLE_D/2 - angle_r*180/np.pi
    
     #read image from file
     print("reading image")
@@ -60,7 +60,8 @@ def SenseRealColour(angle_r, image):
         
         #take a slice of input image that is in the area ww want
         image_slice = image[lower_height:upper_height, left_edge:right_edge]
-        #cv.imshow("my tiny slice", image_slice)
+        
+        cv.imshow("my tiny slice", image_slice)
         
         
         #using CarLogicCamera
@@ -94,9 +95,9 @@ def DrawRectangles(image):
     cv.rectangle(image, [int(scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION), int(height/2+SCAN_THICKNESS)], [int(scan_angle+BLOCK_SEPARATION), int(height/2-SCAN_THICKNESS)], [0, 0, 255])
     
     #lower height
-    cv.line(image, (0, height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT), (width, height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT), (0, 0, 255))
+    cv.line(image, (0, int(height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT)), (width, int(height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT)), (0, 0, 255))
     #upper height
-    cv.line(image, (0, height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT), (width, height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT), (0, 0, 255))
+    cv.line(image, (0, int(height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT)), (width, int(height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT)), (0, 0, 255))
     cv.imshow("Showing", image)
     
     

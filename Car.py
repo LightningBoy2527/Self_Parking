@@ -96,8 +96,8 @@ class Car:
         self.visited_colours = []
 
         self.sensors = { 
-            "RIGHT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
-            "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self, Arena.TRACK_WIDTH - WIDTH - Arena.START_OFFSET_Y),
+            "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
+            "RIGHT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, WIDTH, DIRECTIONS["RIGHT"], self, Arena.TRACK_WIDTH - WIDTH - Arena.START_OFFSET_Y),
             "BACK1": PID(0, WIDTH/2 + BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
             "BACK2": PID(0, WIDTH/2 - BACK_SENSOR_OFFSET, DIRECTIONS["BACK"], self, Arena.START_OFFSET_X),
         }
@@ -109,13 +109,13 @@ class Car:
 
 
         self.camera_rays = (
-            np.pi/5,
             np.pi/6,
-            np.pi/8,
+            np.pi/7,
+            np.pi/9,
             0,
-            -np.pi/8
-            -np.pi/6,
-            -np.pi/5
+            -np.pi/9
+            -np.pi/7,
+            -np.pi/6
         )
 
         self.target_x = centerX + 100
@@ -349,7 +349,7 @@ class Car:
                 self.distance_data[sensor] = sensor.SenseSimDist(generated_arena)
             self.hit_data[sensor] = sensor.FindHitData(code_arena)
 
-        self.LocateOnTrack()
+        #self.LocateOnTrack()
 
         if real:
             self.camera.UpdateImage()
@@ -492,16 +492,16 @@ class Car:
 
         in_bounds = min_x >0 and min_y > 0 and max_x < Arena.TOTAL_WIDTH and max_y < Arena.TOTAL_HEIGHT
         
-        if self.DistTo(x_guess, y_guess) < 50 and abs(Normalise(dir_guess - self.dir)) < np.pi/10 and in_bounds:
-
+        if in_bounds:
+            dist_from_last = self.DistTo(x_guess, y_guess)
             print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
-            if len(x_guesses) > 0:
+            if len(x_guesses) > 0 and dist_from_last < 50:
                 self.x = x_guess
 
-            if len(y_guesses) > 0:
+            if len(y_guesses) > 0 and dist_from_last < 50:
                 self.y = y_guess
 
-            if len(dir_guesses) > 0:
+            if len(dir_guesses) > 0 and abs(Normalise(dir_guess - self.dir)) < np.pi/6:
                 self.dir = dir_guess
 
     def PointInRect(self, x, y, rect):
