@@ -19,8 +19,7 @@ def ReadImage():
             print("detected None image")
             return prev_img
         prev_img = image #for saving errors
-        #DrawStartRectangles(image)
-        cv.imshow("Showing", image)
+        DrawRectangles(image.copy())
         return image
     except Exception as e:
         exception_type, exception_object, traceback = sys.exc_info()
@@ -80,7 +79,7 @@ def SenseRealColour(angle_r, image):
         line = traceback.tb_lineno
         print("Error in SenseRealColour: ",  e, "at ", line)
         
-def DrawStartRectangles(image):
+def DrawRectangles(image):
     START_SCAN_ANGLE = Colours.START_SCAN_ANGLE
     CAMERA_VIEW_ANGLE = Colours.CAMERA_VIEW_ANGLE
     
@@ -90,7 +89,14 @@ def DrawStartRectangles(image):
     
     height, width, channels = image.shape
     scan_angle = int(START_SCAN_ANGLE*width/CAMERA_VIEW_ANGLE)
-    
+    #start rectangles
     cv.rectangle(image, [int(scan_angle-BLOCK_WIDTH-BLOCK_SEPARATION), int(height/2+SCAN_THICKNESS)], [int(scan_angle-BLOCK_SEPARATION), int(height/2-SCAN_THICKNESS)], [255, 0, 0])
     cv.rectangle(image, [int(scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION), int(height/2+SCAN_THICKNESS)], [int(scan_angle+BLOCK_SEPARATION), int(height/2-SCAN_THICKNESS)], [0, 0, 255])
+    
+    #lower height
+    cv.line(image, (0, height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT), (width, height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT), (0, 0, 255))
+    #upper height
+    cv.line(image, (0, height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT), (width, height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT), (0, 0, 255))
+    cv.imshow("Showing", image)
+    
     
