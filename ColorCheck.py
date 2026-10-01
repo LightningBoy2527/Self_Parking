@@ -17,6 +17,8 @@ range = 8 #range for hue
 satRange = 60 #saturation range
 valRange = 60 #range for value
 
+BLACK_THRESH = 30 # value cutoff for black
+
 CAMERA_VIEW_ANGLE = 65 #total camera view angle
 START_SCAN_ANGLE = 65 - 57 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
@@ -89,9 +91,9 @@ def ScanStart(image):
         if myVal1 + valRange >= 255:
             upperVal1 = 255
             lowerVal1 = myVal1 - valRange
-        elif myVal1 - valRange <= 0:
+        elif myVal1 - valRange <= BLACK_THRESH:
             upperVal1 = myVal1 + valRange
-            lowerVal1 = 0
+            lowerVal1 = BLACK_THRESH
         else:
             upperVal1 = myVal1 + valRange
             lowerVal1 = myVal1 - valRange
