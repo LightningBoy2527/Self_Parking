@@ -104,7 +104,7 @@ class Car:
 
         self.esp = Esp32.Esp32("connectioninfo", self, self.sensors)
 
-        self.camera = Camera(LENGTH - 10, 10, DIRECTIONS["RIGHT"], self)
+        self.camera = Camera(LENGTH - 5, 28, DIRECTIONS["RIGHT"], self)
 
 
 

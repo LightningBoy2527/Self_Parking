@@ -17,8 +17,8 @@ range = 15 #range for hue
 satRange = 60 #saturation range
 valRange = 60 #range for value
 
-CAMERA_VIEW_ANGLE = 120 #total camera view angle
-START_SCAN_ANGLE = 120 - 105 #ACW from 0 degrees
+CAMERA_VIEW_ANGLE = 65 #total camera view angle
+START_SCAN_ANGLE = 65 - 57 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
