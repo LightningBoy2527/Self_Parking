@@ -1,2 +1,3 @@
-python CarController.py &
-python CameraConnection.py
+
+python CameraConnection.py & 
+python CarController.py

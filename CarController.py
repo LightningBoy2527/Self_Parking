@@ -74,6 +74,7 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
     for i in range(3, 0, -1):
         print (i)
         car.esp.SendRequest(arena)
+        car.camera.UpdateImage()
         cv.waitKey(1000)
 
     while (car.state != "DONE"):
@@ -104,7 +105,7 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
 
 seed = 3
 real = True
-auto = True
+auto = False
 while True:
     rng.seed(seed)
     generated_arena = Arena.Arena(COLOURS, "SIM")

@@ -524,9 +524,10 @@ class Car:
         
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
         if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
+            print(f"drawing colour: {colour}")
             for rect in (arena.start_rects):
                 if self.PointInRect(x, y, rect):
-                    print(f"bad colour: {rect.colour}")
+                    rect.colour = colour
                     rect.Draw(arena.img)
                     if self.state == "FINDING_START_COLOURS":
                         self.state = "SEARCHING_FOR_TARGET"
