@@ -200,7 +200,7 @@ def CheckColours(image):
             #print(f"detected colour b: {real_color2}")
             return tuple((cv.cvtColor(np.uint8([[real_color2]]), cv.COLOR_HSV2BGR)[0,0])) #there is a colour in that range of colour 2
         else:
-            return (181, 228, 255) #brown, colour if wall
+            return (0, 0, 0) #return black
     except Exception as e:
         print("ERROR in CheckColours: ", e)
         return (181, 228, 255)
