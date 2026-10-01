@@ -28,7 +28,7 @@ def ConfigureCamera():
     #only sets frame size atm
     print("\nconfiguring ESP-32 CAM...")
     try:
-        setCameraSettings("framesize", 0) #0#96x96 3#176x144
+        setCameraSettings("framesize", 3) #0#96x96 3#176x144
         setCameraSettings("brightness", -2)
         setCameraSettings("contrast", 0)
         setCameraSettings("saturation", 3)

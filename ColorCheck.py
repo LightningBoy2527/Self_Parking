@@ -13,12 +13,12 @@ real_color2 = np.array([])
 lowerColor2 = np.array([])
 upperColor2 = np.array([])
 
-range = 7 #range for hue
+range = 15 #range for hue
 satRange = 60 #saturation range
 valRange = 60 #range for value
 
 CAMERA_VIEW_ANGLE = 120 #total camera view angle
-START_SCAN_ANGLE = 120 - 100 #ACW from 0 degrees
+START_SCAN_ANGLE = 120 - 105 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
@@ -38,9 +38,8 @@ def ScanStart(image):
         global real_color2
         #get the height and width of the image
         height, width, channels = image.shape
-        #get the halfway point
+        #get the halfway points
         scan_angle = int(START_SCAN_ANGLE*width/CAMERA_VIEW_ANGLE)
-        scan_angle = int(width/2)
         halfheight = int(height/2)
         #print(halfheight)
         #print(scan_angle)
@@ -48,7 +47,8 @@ def ScanStart(image):
         #the two blocks are at center height, in th middle with 200 pixels beween each block
         #get the two blocks and average their h,s,v values
         block1 = image[halfheight-SCAN_THICKNESS :halfheight+SCAN_THICKNESS, scan_angle-BLOCK_WIDTH-BLOCK_SEPARATION:scan_angle-BLOCK_SEPARATION]
-        #cv.imshow('block 1: ', block1)
+        block1 = cv.resize(block1, (200, 200), cv.INTER_CUBIC)
+        cv.imshow('block 1: ', block1)
         block1 = cv.cvtColor(block1, cv.COLOR_BGR2HSV)
         myHue1 = int(np.mean(block1[:,:, 0]))
         mySat1 = int(np.mean(block1[:,:, 1]))
@@ -56,7 +56,8 @@ def ScanStart(image):
         real_color1 = np.array([myHue1, mySat1, myVal1])
         
         block2 = image[halfheight-SCAN_THICKNESS:halfheight+SCAN_THICKNESS, scan_angle+BLOCK_SEPARATION:scan_angle+BLOCK_WIDTH+BLOCK_SEPARATION]
-        #cv.imshow('block 2: ', block2)
+        block2 = cv.resize(block2, (200, 200), cv.INTER_CUBIC)
+        cv.imshow('block 2: ', block2)
         block2 = cv.cvtColor(block2, cv.COLOR_BGR2HSV)
         myHue2 = int(np.mean(block2[:,:, 0]))
         mySat2 = int(np.mean(block2[:,:, 1]))
@@ -128,11 +129,11 @@ def ScanStart(image):
             
         #set colour1
         lowerColor1 = np.array([lowerHue1, lowerSat1, lowerVal1], dtype=np.uint8)
-        upperColor1 = np.array([upperHue1, upperSat1, upperVal1], dtype=np.uint8)
+        upperColor1 = np.array([upperHue1, 255, 255], dtype=np.uint8)
         print('color 1: ', lowerHue1, upperHue1, lowerSat1, upperSat1, lowerVal1, upperVal1)
         #set colour 2
         lowerColor2 = np.array([lowerHue2, lowerSat2, lowerVal2], dtype=np.uint8)
-        upperColor2 = np.array([upperHue2, upperSat2, upperVal2], dtype=np.uint8)
+        upperColor2 = np.array([upperHue2, 255, 255], dtype=np.uint8)
         print('color 2: ', lowerHue2, upperHue2, lowerSat2, upperSat2, lowerVal2, upperVal2)
     except Exception as e:
         exception_type, exception_object, traceback = sys.exc_info()
@@ -153,7 +154,7 @@ def CheckColour(hsv, upperCo, lowerCo):
         # print(upperColor1)
         # print(lowerColor1)
         
-        if all(avg_color < upperCo) and all(avg_color > lowerCo):
+        if all(avg_color <= upperCo) and all(avg_color >= lowerCo):
             #print("Color was within range")
             return True
         else:
@@ -185,13 +186,16 @@ def CheckColours(image):
         #check for both colours
         a = CheckColour(hsv, upperColor1, lowerColor1)
         b = CheckColour(hsv, upperColor2, lowerColor2)
+
+        # print(f"a: {a}, hsv: {hsv}, upper: {upperColor1}, lower: {lowerColor1}")
+        # print(f"b: {b}, hsv: {hsv}, upper: {upperColor2}, lower: {lowerColor2}")
         
         if (a):
-            print(f"detected colour a: {real_color1}")
-            return tuple((cv.cvtColor(real_color1, cv.COLOR_HSV2BGR)[0])[0]) #there is a colour in that range of colour 1
+            #print(f"detected colour a: {real_color1}")
+            return tuple((cv.cvtColor(np.uint8([[real_color1]]), cv.COLOR_HSV2BGR)[0,0])) #there is a colour in that range of colour 1
         elif (b): 
-            print(f"detected colour b: {real_color2}")
-            return tuple((cv.cvtColor(real_color2, cv.COLOR_HSV2BGR)[0])[0]) #there is a colour in that range of colour 2
+            #print(f"detected colour b: {real_color2}")
+            return tuple((cv.cvtColor(np.uint8([[real_color2]]), cv.COLOR_HSV2BGR)[0,0])) #there is a colour in that range of colour 2
         else:
             return (181, 228, 255) #brown, colour if wall
     except Exception as e:

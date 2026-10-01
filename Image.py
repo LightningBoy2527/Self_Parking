@@ -19,7 +19,7 @@ def ReadImage():
             print("detected None image")
             return prev_img
         prev_img = image #for saving errors
-        DrawStartRectangles(image)
+        #DrawStartRectangles(image)
         cv.imshow("Showing", image)
         return image
     except Exception as e:
@@ -35,10 +35,11 @@ def ReadImage():
 def SenseRealColour(angle_r, image):
     #translate from +/- pi to angle_d
     #if angle_r is less than zero, do 90 - angle_r
-    if angle_r < 0:
-        angle_d = VIEW_ANGLE_D/2 - angle_r*180/np.pi
-    else:
-        angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
+    # if angle_r < 0:
+    #     angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
+    # else:
+        
+    angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
    
     #read image from file
     print("reading image")
@@ -70,6 +71,7 @@ def SenseRealColour(angle_r, image):
             return (0, 0, 0) #return ideal black
         else:
             result = Colours.CheckColours(image_slice)
+            print(result)
             return result
         
     except Exception as e:
