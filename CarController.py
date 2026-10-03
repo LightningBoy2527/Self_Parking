@@ -71,12 +71,14 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
     #camera_subprocess = subprocess.Popen([sys.executable, "CameraConnection.py"]) #starts getting images from camera
     car.esp.SetMotorSpeed(0)
     car.esp.SetTurningAngle(0)
-    for i in range(3, 0, -1):
-        print (i)
-        car.esp.SendRequest(arena)
-        car.camera.UpdateImage()
-        cv.waitKey(1000)
+    if real:
+        for i in range(3, 0, -1):
+            print (i)
+            car.esp.SendRequest(arena)
+            car.camera.UpdateImage()
+            cv.waitKey(1000)
 
+    car.UpdateClockDiff()
     while (car.state != "DONE"):
         car.UpdateClockDiff()
         car.DoSensorsAndStates(generated_arena, code_arena, arena, IGNORED_COLOURS.values(), real, auto)
@@ -101,10 +103,10 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
     return
 
 
+start_angle = (rng.random() * 2 - 1) * 0.05
 
-
-seed = 3
-real = True
+seed = 1
+real = False
 auto = True
 while True:
     rng.seed(seed)
@@ -112,7 +114,7 @@ while True:
     code_arena = Arena.Arena(COLOURS, "CODE")
     arena = Arena.Arena(COLOURS)
     (x, y) = arena.start_pos
-    car = Car.Car(x, y, 0.0)        
+    car = Car.Car(x, y, start_angle)        
     if real:
         car.camera.CameraOn(is_on = True)
     if not auto:
