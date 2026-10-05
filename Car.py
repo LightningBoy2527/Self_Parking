@@ -250,7 +250,7 @@ class Car:
         dx = target_x - self.x
         dy = target_y - self.y
         dist_to_target = DistAB(self.x, self.y, target_x, target_y)
-        print(f"Dot: {Dot(dx /  dist_to_target, dy / dist_to_target, np.cos(target_dir), -np.sin(target_dir))}")
+        #print(f"Dot: {Dot(dx /  dist_to_target, dy / dist_to_target, np.cos(target_dir), -np.sin(target_dir))}")
         return False if Dot(dx /  dist_to_target, dy / dist_to_target, np.cos(target_dir), -np.sin(target_dir)) > 0 else True
         
 
@@ -336,7 +336,7 @@ class Car:
 
         if self.movement_state == "BACKING_UP":
             target_speed = -1 * MAX_SPEED
-            print(f"car facing line: {car_facing_line}, dtheta: {dtheta}, line alignment: {line_alignment}, car alignment: {car_alignment}, max wheel dir: {self.max_wheel_dir}, left of line: {left_of_line}")
+            #print(f"car facing line: {car_facing_line}, dtheta: {dtheta}, line alignment: {line_alignment}, car alignment: {car_alignment}, max wheel dir: {self.max_wheel_dir}, left of line: {left_of_line}")
             if car_facing_line:
                 #turn towards line
                 target_wheel_dir = -(dtheta)# * abs(line_alignment))#* abs(car_alignment) )#+ (1 - abs(line_alignment)* abs(car_alignment)) * self.max_wheel_dir * left_of_line)
@@ -349,7 +349,7 @@ class Car:
                 
             
             if intersection_point_x is not None:
-                print(f"overshot turning point: {self.HasOvershot(intersection_point_x, intersection_point_y, self.dir)}, overshot target: {self.HasOvershot(target_x, target_y, target_dir)}")
+                #print(f"overshot turning point: {self.HasOvershot(intersection_point_x, intersection_point_y, self.dir)}, overshot target: {self.HasOvershot(target_x, target_y, target_dir)}")
                 if (not self.HasOvershot(intersection_point_x, intersection_point_y, self.dir) or abs(Cross(intersection_point_x, intersection_point_y, np.cos(target_dir), -np.sin(target_dir))) / DistAB(intersection_point_x, intersection_point_y, target_x, target_y) < TARGET_WIDTH/2 ) and not self.HasOvershot(target_x, target_y, target_dir) and dist_to_target > BACKUP_DIST:
                     self.movement_state = "TURNING"
                     target_speed = MAX_SPEED
@@ -359,7 +359,7 @@ class Car:
                         target_wheel_dir = 0
         
 
-        print(f"target speed: {target_speed} target turning angle: {target_wheel_dir}")
+        #print(f"target speed: {target_speed} target turning angle: {target_wheel_dir}")
         self.Turn(target_wheel_dir)
         self.Drive(target_speed)
 
@@ -378,7 +378,8 @@ class Car:
             self.hit_data[sensor] = sensor.FindHitData(code_arena)
 
         if real:
-            self.LocateOnTrack()
+            #self.LocateOnTrack()
+            pass
 
         if real:
             self.camera.UpdateImage()
@@ -388,6 +389,7 @@ class Car:
             else:
                 self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
             if self.colour_data[angle] is not None:
+                print(f"colour {self.colour_data[angle]} at angle {angle}")
                 self.InterpretCameraData(arena, angle, self.colour_data[angle], ignored_colours)
         
         if not auto:
@@ -398,7 +400,7 @@ class Car:
             self.MoveTo(self.target_x, self.target_y, 0)
                
         elif self.state == "SEARCHING_FOR_TARGET":
-            print(self.DistTo(self.target_x,self.target_y))
+            #print(self.DistTo(self.target_x,self.target_y))
             self.FindTarget(arena)
             self.MoveTo(self.target_x, self.target_y, 0)
             if self.DistTo(self.target_x, self.target_y) < WAYPOINT_TOLERANCE and self.state == "SEARCHING_FOR_TARGET":
@@ -418,6 +420,7 @@ class Car:
                 self.state = "PARKED"
 
         elif self.state == "PARKED":
+            self.speed = 0
             cv.waitKey(0)
             self.UpdateClockDiff()
             self.FindTarget(arena)
@@ -523,14 +526,14 @@ class Car:
         
         if in_bounds:
             dist_from_last = self.DistTo(x_guess, y_guess)
-            print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
-            if len(x_guesses) > 0 and dist_from_last < 50:
+            #print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
+            if dist_from_last < 50:
                 self.x = x_guess
 
-            if len(y_guesses) > 0 and dist_from_last < 50:
+            if dist_from_last < 50:
                 self.y = y_guess
 
-            if len(dir_guesses) > 0 and abs(Normalise(dir_guess - self.dir)) < np.pi/6:
+            if abs(Normalise(dir_guess - self.dir)) < np.pi/6:
                 self.dir = dir_guess
 
     def PointInRect(self, x, y, rect):
@@ -553,7 +556,7 @@ class Car:
         
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
         if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
-            print(f"drawing colour: {colour}")
+            #print(f"drawing colour: {colour}")
             for rect in (arena.start_rects):
                 if self.PointInRect(x, y, rect):
                     rect.colour = colour
@@ -596,7 +599,6 @@ class Car:
             target_park = sorted(target_parks, key = lambda rect: rect.pt1[0])[0]
             target_park_rect = sorted(target_park_rects, key = lambda rect: rect.pt1[0])[0]
             if self.state == "PARKED":
-                print("here")
                 self.visited_colours.append(target_park_rect.colour)
                 self.state = "REVERSING_OUT"
                 self.target_x = target_park.center[0] - REAL_TURNING_RADIUS

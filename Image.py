@@ -64,7 +64,7 @@ def SenseRealColour(angle_r, image):
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
         result = Colours.CheckColours(image_slice)
-        print(result)
+        #print(result)
         return result
         
     except Exception as e:

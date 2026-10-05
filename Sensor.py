@@ -70,7 +70,7 @@ class Camera(Sensor):
         return self.last_img
     
     def UpdateImage(self):
-        Image.ReadImage()
+        self.last_img = Image.ReadImage()
         
     def SenseSimColour(self, arena, ray_angle):
             img = arena.img
@@ -87,7 +87,9 @@ class Camera(Sensor):
             pass
 
     def SenseRealColour(self, ray_angle):
-        return Image.SenseRealColour(ray_angle, self.last_img)
+        colour = Image.SenseRealColour(ray_angle, self.last_img)
+        print(f"image hash: {hash(self.last_img.tobytes())}")
+        return colour
 
 class PID(Sensor):
     def __init__(self, x, y, dir, parent, initial_sense):
@@ -101,8 +103,6 @@ class PID(Sensor):
         dx = x - self.x
         dy = y - self.y
         dist = np.sqrt(dx**2 + dy**2)
-        if dist > 300:
-                dist = 300
         #print(f"sensor dists: x{dx} y{dy} dist{dist}")
         return dist
 
