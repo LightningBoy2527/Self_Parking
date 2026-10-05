@@ -513,7 +513,7 @@ class Car:
         dir_guesses = NonNaNSubset(dir_guesses)
 
         if len(dir_guesses) > 0:
-            print(dir_guesses)
+            print(f"dir_guesses: {dir_guesses}")
             dir_guess = np.median(dir_guesses)
 
         newCarRect = Arena.RotatedRect((x_guess, y_guess), (LENGTH, WIDTH), -180/np.pi * dir_guess, COLOUR)

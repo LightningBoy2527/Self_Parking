@@ -106,7 +106,7 @@ def RunCar(arena, generated_arena, code_arena, car, real, auto):
 start_angle = (rng.random() * 2 - 1) * 0.05
 
 seed = 1
-real = False
+real = True
 auto = True
 while True:
     rng.seed(seed)
