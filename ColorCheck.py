@@ -183,7 +183,7 @@ def CheckColours(image):
         #get horizontal slice 
         #blur image
         ksize = (3,3)
-        hsv = cv.blur(hsv, ksize)   
+        #hsv = cv.blur(hsv, ksize)   
         #cv.imshow('Blur', hsv)  
         
         #check for both colours
