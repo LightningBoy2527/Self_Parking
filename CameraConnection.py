@@ -31,7 +31,7 @@ def ConfigureCamera():
         setCameraSettings("framesize", 3) #0#96x96 3#176x144
         setCameraSettings("brightness", -2)
         setCameraSettings("contrast", 0)
-        setCameraSettings("saturation", 3)
+        setCameraSettings("saturation", 2)
         setCameraSettings("ae_level", -1) #assuming this stands for auto-exposure level
     except:
         print("camera failed to set up")

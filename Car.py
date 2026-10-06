@@ -22,7 +22,7 @@ WHEEL_INSET = 20 #mm
 STEERING_AXLE_OFFSET = 8 #mm
 STEERING_SPEED = 2 #rad/sec
 MAX_SPEED = 33.3#26.0 #mm/sec
-ACCELERATION_LIMIT = 60 #mm/sec^2
+ACCELERATION_LIMIT = 600 #mm/sec^2
 DRAG = 0.96
 BACK_SENSOR_OFFSET = 12.5 #mm, distance from centerline of car to back sensors
 SIDE_SENSOR_OFFSET = 16.5 #mm, distance from centerline of car to side sensors
@@ -110,11 +110,11 @@ class Car:
 
         self.camera_rays = (
             np.pi/6,
-            np.pi/7,
-            np.pi/9,
+            np.pi/8,
+            np.pi/12,
             0,
-            -np.pi/9
-            -np.pi/7,
+            -np.pi/12
+            -np.pi/8,
             -np.pi/6
         )
 
@@ -231,8 +231,9 @@ class Car:
             self.dir = self.dir + np.arctan2(rel_y_wheel_movement, self.wheelbase)
 
     def Move(self, real, arena):
-        SLOWER_WHEN_TURNING = 0.95
-        inst_speed = self.PerSecondToPerCycle(self.speed)
+        SLOWER_WHEN_TURNING = 0.5
+        SLOWER_WHEN_REVERSING = 0.93
+        inst_speed = self.PerSecondToPerCycle(self.speed) if self.speed >= 0 else self.PerSecondToPerCycle(self.speed) * SLOWER_WHEN_REVERSING
         self.x = self.x + inst_speed * np.cos(self.dir - self.wheel_dir/(2 * SLOWER_WHEN_TURNING))
         self.y = self.y - inst_speed * np.sin(self.dir - self.wheel_dir/(2 * SLOWER_WHEN_TURNING))
         self.dir = self.dir + inst_speed/self.wheelbase * np.tan(self.wheel_dir)
@@ -446,6 +447,7 @@ class Car:
         #print(f"location: {self.x}, {self.y}")
 
     def LocateOnTrack(self):
+        SIM_BIAS = 0.75
         inst_speed = self.PerSecondToPerCycle(self.speed)
         x_guess = self.x
         y_guess = self.y
@@ -539,13 +541,13 @@ class Car:
             dist_from_last = self.DistTo(x_guess, y_guess)
             #print(f"Updating to x:{self.x}, y:{self.y}, dir:{dir_guess}")
             if dist_from_last < 50:
-                self.x = x_guess
+                self.x = self.x * SIM_BIAS + x_guess * (1-SIM_BIAS)
 
             if dist_from_last < 50:
-                self.y = y_guess
+                self.y = self.y * SIM_BIAS + y_guess * (1-SIM_BIAS)
 
-            if abs(Normalise(dir_guess - self.dir)) < np.pi/6:
-                self.dir = dir_guess
+            # if abs(Normalise(dir_guess - self.dir)) < np.pi/6:
+            #     self.dir = self.dir * SIM_BIAS + dir_guess * (1-SIM_BIAS)
 
     def PointInRect(self, x, y, rect):
         if rect.pt1[0] <= x and rect.pt2[0] >= x and rect.pt1[1] <= y and rect.pt2[1] >= y:

@@ -13,9 +13,9 @@ real_color2 = np.array([])
 lowerColor2 = np.array([])
 upperColor2 = np.array([])
 
-range = 8 #range for hue
-satRange = 60 #saturation range
-valRange = 60 #range for value
+range = 7 #range for hue
+satRange = 50 #saturation range
+valRange = 50 #range for value
 
 BLACK_THRESH = 30 # value cutoff for black
 
@@ -25,7 +25,8 @@ BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
 SCAN_HEIGHT = 5 #how far to offset scan from center height
-SCAN_WIDTH = 3 #the width on either side of the scan angle
+SCAN_WIDTH = 2 #the width on either side of the scan angle
+SCAN_OFFSET = 69-144/2 #at 144 pixels high image #how many pixels to offset the ray scan by (+ve is to left on image)
 #begin function
 #scans the two colours stores in global  colours
 def ScanStart(image):

@@ -8,6 +8,7 @@ SCAN_THICKNESS = Colours.SCAN_THICKNESS
 VIEW_ANGLE_D = Colours.CAMERA_VIEW_ANGLE
 SCAN_HEIGHT = Colours.SCAN_HEIGHT
 SCAN_WIDTH = Colours.SCAN_WIDTH
+SCAN_OFFSET = Colours.SCAN_OFFSET
 prev_img = np.array([]) #the previous image incase of read error
 
 def ReadImage():
@@ -52,8 +53,8 @@ def SenseRealColour(angle_r, image):
         angle_d_step = width/VIEW_ANGLE_D
         #when writing this I assumed positive angle_d is cw
         #cv does row column, so positive means more right
-        right_edge = int(angle_d_step*angle_d + SCAN_WIDTH)
-        left_edge = int(angle_d_step*angle_d - SCAN_WIDTH)
+        right_edge = int(angle_d_step*angle_d + SCAN_WIDTH - SCAN_OFFSET)
+        left_edge = int(angle_d_step*angle_d - SCAN_WIDTH - SCAN_OFFSET)
         
         #take a slice of input image that is in the area ww want
         image_slice = image[lower_height:upper_height, left_edge:right_edge]
