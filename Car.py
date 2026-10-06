@@ -381,8 +381,7 @@ class Car:
             print(f"{sensor} hit at {sensor.FindHitData(code_arena)}")
 
         if real:
-            self.LocateOnTrack()
-
+            self.LocateOnTrack
         if real:
             self.camera.UpdateImage()
         for angle in self.camera_rays:
