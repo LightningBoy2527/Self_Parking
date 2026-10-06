@@ -21,7 +21,7 @@ REAR_AXLE_POS = 20 #mm
 WHEEL_INSET = 20 #mm
 STEERING_AXLE_OFFSET = 8 #mm
 STEERING_SPEED = 2 #rad/sec
-MAX_SPEED = 26.0 #mm/sec
+MAX_SPEED = 33.3#26.0 #mm/sec
 ACCELERATION_LIMIT = 60 #mm/sec^2
 DRAG = 0.96
 BACK_SENSOR_OFFSET = 12.5 #mm, distance from centerline of car to back sensors
@@ -231,9 +231,10 @@ class Car:
             self.dir = self.dir + np.arctan2(rel_y_wheel_movement, self.wheelbase)
 
     def Move(self, real, arena):
+        SLOWER_WHEN_TURNING = 0.95
         inst_speed = self.PerSecondToPerCycle(self.speed)
-        self.x = self.x + inst_speed * np.cos(self.dir - self.wheel_dir/2)
-        self.y = self.y - inst_speed * np.sin(self.dir - self.wheel_dir/2)
+        self.x = self.x + inst_speed * np.cos(self.dir - self.wheel_dir/(2 * SLOWER_WHEN_TURNING))
+        self.y = self.y - inst_speed * np.sin(self.dir - self.wheel_dir/(2 * SLOWER_WHEN_TURNING))
         self.dir = self.dir + inst_speed/self.wheelbase * np.tan(self.wheel_dir)
 
         if real:
@@ -376,10 +377,10 @@ class Car:
             else:
                 self.distance_data[sensor] = sensor.SenseSimDist(generated_arena)
             self.hit_data[sensor] = sensor.FindHitData(code_arena)
+            print(f"{sensor} hit at {sensor.FindHitData(code_arena)}")
 
         if real:
-            #self.LocateOnTrack()
-            pass
+            self.LocateOnTrack()
 
         if real:
             self.camera.UpdateImage()
@@ -390,7 +391,7 @@ class Car:
                 self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
             if self.colour_data[angle] is not None:
                 print(f"colour {self.colour_data[angle]} at angle {angle}")
-                self.InterpretCameraData(arena, angle, self.colour_data[angle], ignored_colours)
+                self.InterpretCameraData(arena, code_arena, angle, self.colour_data[angle], ignored_colours)
         
         if not auto:
              RunManually.MoveManually(self)
@@ -421,6 +422,8 @@ class Car:
 
         elif self.state == "PARKED":
             self.speed = 0
+            self.Move(real, arena)
+            
             cv.waitKey(0)
             self.UpdateClockDiff()
             self.FindTarget(arena)
@@ -443,9 +446,10 @@ class Car:
         #print(f"location: {self.x}, {self.y}")
 
     def LocateOnTrack(self):
+        inst_speed = self.PerSecondToPerCycle(self.speed)
         x_guess = self.x
         y_guess = self.y
-        dir_guess = self.dir
+        dir_guess = self.dir + inst_speed/self.wheelbase * np.tan(self.wheel_dir)
 
         x_guesses = {}
         y_guesses = {}
@@ -483,34 +487,41 @@ class Car:
         for guess_dict in (x_guesses, y_guesses):
             if len(guess_dict) >= 2:
                 sensors = list(guess_dict.keys())
-                for sensor1 in sensors:
-                    for sensor2 in sensors[sensors.index(sensor1):]:
-                        if PrettyClose(guess_dict[sensor1], guess_dict[sensor2]):
+                for i, sensor1 in enumerate(sensors):
+                    for sensor2 in sensors[i+1:]:
+                        if PrettyClose(hit_1d[sensor1], hit_1d[sensor2]):
                             if sensor1.dir_offset == sensor2.dir_offset:
-                                dir_guesses.append(
-                                    np.atan2(
-                                        DistBetweenGuesses(sensor1, sensor2, self.distance_data),
-                                        DistBetweenSensors(sensor1, sensor2)
-                                    )
-                                )
+                                pass #super inaccurate at close distance, sensors are bad at long ones.
+                                # dir_guesses.append(
+                                #     np.atan2(
+                                #         DistBetweenGuesses(sensor1, sensor2, self.distance_data),
+                                #         DistBetweenSensors(sensor1, sensor2)
+                                # ))
+                                # print(f"dir_guess from two back sensors: {dir_guesses[-1]}")
                             else:
-                                    dir_guesses.append(
-                                        np.atan2(
-                                            self.distance_data[sensor1] 
-                                            + sensor1.x_offset * np.cos(sensor1.dir_offset) 
-                                            + sensor1.y_offset * np.sin(sensor1.dir_offset)
-                                            ,
-                                            self.distance_data[sensor2] 
-                                            + sensor2.x_offset * np.sin(sensor2.dir_offset)
-                                            + sensor2.y_offset * np.cos(sensor2.dir_offset)
-                                    ))
+                                dir_guesses.append(
+                                    -np.atan2(
+                                        self.distance_data[sensor1] 
+                                        + sensor1.x_offset * np.cos(sensor1.dir_offset) 
+                                        + sensor1.y_offset * np.sin(sensor1.dir_offset)
+                                        ,
+                                        self.distance_data[sensor2] 
+                                        + sensor2.x_offset * np.sin(sensor2.dir_offset)
+                                        + sensor2.y_offset * np.cos(sensor2.dir_offset)
+                                ))
+                                print(f"dir_guess from a side and a back sensor: {dir_guesses[-1]}")
                         else:
-                            dir_guesses.append(
-                                np.arccos(
-                                    DistBetweenGuesses(sensor1, sensor2, hit_1d) /
-                                    (self.distance_data[sensor1] + self.distance_data[sensor2] + DistBetweenSensors(sensor1, sensor2))
-                                )
-                            )
+                            pass #also super innacurate, to the point I think my maths is wrong
+                            # dir_guesses.append(
+                            #     np.arccos(
+                            #         np.clip(
+                            #             DistBetweenGuesses(sensor1, sensor2, hit_1d) /
+                            #             (self.distance_data[sensor1] + self.distance_data[sensor2] + DistBetweenSensors(sensor1, sensor2)),
+                            #             -1, 1
+                            #         )
+                            # ))
+                            # print(f"dir_guess from two side sensors: {dir_guesses[-1]}")
+        print(f"simulated dir: {self.dir}")
         NonNaNSubset = lambda arr: [item for item in arr if np.isfinite(item)]
         
         dir_guesses = NonNaNSubset(dir_guesses)
@@ -542,7 +553,7 @@ class Car:
         else:
             return False
 
-    def InterpretCameraData(self, arena, angle, colour, ignored_colours):
+    def InterpretCameraData(self, arena, code_arena, angle, colour, ignored_colours):
         colour = tuple(int(c) for c in colour)
         #print(f"colour observed: {colour} at angle {angle}")
         if colour != Arena.PARKED_CAR_COLOUR:
@@ -553,6 +564,7 @@ class Car:
                     if self.PointInRect(x ,y, car_rect):
                         car_rect.colour = None  
                         car_rect.Draw(arena.img)
+                        car_rect.Draw(code_arena.img)
         
         (x, y) = self.camera.FindRayIntercept(arena.img, angle)
         if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):

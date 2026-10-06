@@ -8,7 +8,7 @@ START_LENGTH = 345 # mm
 START_OFFSET_X = 23 #mm from back wall
 START_OFFSET_Y = 103 #mm from left wall (top)
 START_RECT_X_OFFSET = 225 #mm to start of coloured rects form back wall
-TRACK_WIDTH = 268 # mm, excluding parks
+TRACK_WIDTH = 266 # mm, excluding parks
 PARK_BUFFER = 20 #space between wall and first 120mm wide park
 PARK_STANDOFF = 14 #mm between bumper and wall for parks
 PARK_WIDTH = 120 # mm
@@ -25,6 +25,7 @@ BACKGROUND_COLOUR = (255,255,255)
 PARKED_CAR_COLOUR = (0,0,0)
 WALL_COLOUR = (181, 228, 255)
 CORNER_SENSOR_BUFFER = 30 # mm
+CAR_SENSOR_BUFFER = 10 #mm
 
 COLOUR_CODE = {     #colour codes for known x, y walls in colour coded arena
     (110,0,0): (0, None),
@@ -77,7 +78,7 @@ class Arena:
             park_center_y = int(TRACK_WIDTH + PARK_DEPTH - PARK_STANDOFF - Car.LENGTH//2)
             park_bottom = TOTAL_HEIGHT
 
-            car_rect = Rect((park_center_x - Car.WIDTH//2, park_center_y - Car.LENGTH//2), (park_center_x + Car.WIDTH//2, park_center_y + Car.LENGTH//2), PARKED_CAR_COLOUR)
+            car_rect = Rect((park_center_x - Car.WIDTH//2, park_center_y - Car.LENGTH//2 + CAR_SENSOR_BUFFER), (park_center_x + Car.WIDTH//2, park_center_y + Car.LENGTH//2 - CAR_SENSOR_BUFFER), PARKED_CAR_COLOUR)
             self.car_rects.append(car_rect)
 
             colour_rect = Rect((park_center_x - HALF_RECT_WIDTH, park_bottom), (park_center_x + HALF_RECT_WIDTH, park_bottom + RECT_DEPTH), WALL_COLOUR)

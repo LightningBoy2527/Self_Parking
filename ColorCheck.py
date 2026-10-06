@@ -24,7 +24,7 @@ START_SCAN_ANGLE = 65 - 57 #ACW from 0 degrees
 BLOCK_SEPARATION = 5 #pixels between the two start colours
 BLOCK_WIDTH = 8 #width of start scan colour avg blocks
 SCAN_THICKNESS = 10  #vertical height of our scan band (both normal scans and start scan)
-SCAN_HEIGHT = 10 #how far to offset scan from center height
+SCAN_HEIGHT = 5 #how far to offset scan from center height
 SCAN_WIDTH = 3 #the width on either side of the scan angle
 #begin function
 #scans the two colours stores in global  colours
