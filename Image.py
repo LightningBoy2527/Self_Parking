@@ -33,38 +33,20 @@ def ReadImage():
 #divide the input pixels into 120 degrees by using .shape
 #get the desired pixels
 #output idealized color depending on avg pixel
-def SenseRealColour(angle_r, image):
+def SenseRealColour(image):
     #translate from +/- pi to angle_d
     #if angle_r is less than zero, do 90 - angle_r
     # if angle_r < 0:
     #     angle_d = VIEW_ANGLE_D/2 + angle_r*180/np.pi
     # else:
-        
-    angle_d = VIEW_ANGLE_D/2 - angle_r*180/np.pi
     
     try:
-        #get image size
-        height, width, channels = image.shape
         
-        #more positive means lower down
-        lower_height = int(height/2 - SCAN_THICKNESS/2 + SCAN_HEIGHT)
-        upper_height = int(height/2 + SCAN_THICKNESS/2 + SCAN_HEIGHT)
-        
-        angle_d_step = width/VIEW_ANGLE_D
-        #when writing this I assumed positive angle_d is cw
-        #cv does row column, so positive means more right
-        right_edge = int(angle_d_step*angle_d + SCAN_WIDTH - SCAN_OFFSET)
-        left_edge = int(angle_d_step*angle_d - SCAN_WIDTH - SCAN_OFFSET)
-        
-        #take a slice of input image that is in the area ww want
-        image_slice = image[lower_height:upper_height, left_edge:right_edge]
-        
-        cv.imshow("my tiny slice", image_slice)
-        
+        cv.imshow("image i guess", image)
         
         #using CarLogicCamera
         #this function returns true if the input image has contour of said size and is within range
-        result = Colours.CheckColours(image_slice)
+        result = Colours.CheckColours(image)
         #print(result)
         return result
         

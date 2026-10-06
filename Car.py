@@ -94,6 +94,7 @@ class Car:
         self.colour_data = {}
         self.hit_data = {}
         self.visited_colours = []
+        self.contour = None
 
         self.sensors = { 
             "LEFT": PID(LENGTH/2 - SIDE_SENSOR_OFFSET, 0, DIRECTIONS["LEFT"], self, Arena.START_OFFSET_Y),
@@ -384,14 +385,18 @@ class Car:
             self.LocateOnTrack
         if real:
             self.camera.UpdateImage()
-        for angle in self.camera_rays:
-            if real:
-                self.colour_data[angle] = self.camera.SenseRealColour(angle)
-            else:
-                self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
-            if self.colour_data[angle] is not None:
-                print(f"colour {self.colour_data[angle]} at angle {angle}")
-                self.InterpretCameraData(arena, code_arena, angle, self.colour_data[angle], ignored_colours)
+
+        if real:
+            self.contour = self.camera.SenseRealColour()
+            self.InterpretCameraData(arena, code_arena, self.contour)
+        # for angle in self.camera_rays:
+        #     if real:
+        #         self.colour_data[angle] = self.camera.SenseRealColour(angle)
+        #     else:
+        #         self.colour_data[angle] = self.camera.SenseSimColour(generated_arena, angle)
+        #     if self.colour_data[angle] is not None:
+        #         print(f"colour {self.colour_data[angle]} at angle {angle}")
+        #         self.InterpretCameraData(arena, code_arena, angle, self.colour_data[angle], ignored_colours)
         
         if not auto:
              RunManually.MoveManually(self)
@@ -548,31 +553,19 @@ class Car:
             # if abs(Normalise(dir_guess - self.dir)) < np.pi/6:
             #     self.dir = self.dir * SIM_BIAS + dir_guess * (1-SIM_BIAS)
 
-    def PointInRect(self, x, y, rect):
-        if rect.pt1[0] <= x and rect.pt2[0] >= x and rect.pt1[1] <= y and rect.pt2[1] >= y:
+    def PointInRect(self, x, rect):
+        if rect.pt1[0] <= x and rect.pt2[0] >= x:
             return True
         else:
             return False
 
-    def InterpretCameraData(self, arena, code_arena, angle, colour, ignored_colours):
-        colour = tuple(int(c) for c in colour)
-        #print(f"colour observed: {colour} at angle {angle}")
-        if colour != Arena.PARKED_CAR_COLOUR:
-            while np.array_equal(self.camera.SenseSimColour(arena, angle), Arena.PARKED_CAR_COLOUR): 
-                (x, y) = self.camera.FindRayIntercept(arena.img, angle)
-                full_car_rects =  [rect for rect in arena.car_rects if rect.colour is not None]
-                for car_rect in full_car_rects:
-                    if self.PointInRect(x ,y, car_rect):
-                        car_rect.colour = None  
-                        car_rect.Draw(arena.img)
-                        car_rect.Draw(code_arena.img)
+    def InterpretCameraData(self, arena, code_arena, contour):
         
-        (x, y) = self.camera.FindRayIntercept(arena.img, angle)
-        if not any(np.array_equal(colour, bad_colour) for bad_colour in ignored_colours):
-            #print(f"drawing colour: {colour}")
+        x,y,wide,high = cv.boundingRect(contour)
+        if (x + (wide/2) < 70):
             for rect in (arena.start_rects):
-                if self.PointInRect(x, y, rect):
-                    rect.colour = colour
+                if self.PointInRect(self.esp.sensors[0]/2 + self.esp.sensors[1]/2 + 70, rect):
+                    rect.colour = (255,0,255)
                     rect.Draw(arena.img)
                     if self.state == "FINDING_START_COLOURS":
                         self.state = "SEARCHING_FOR_TARGET"

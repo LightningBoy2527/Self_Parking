@@ -148,21 +148,32 @@ def ScanStart(image):
 #uses contours to check an hsv image for colour
 def CheckColour(hsv, upperCo, lowerCo):
     try:
-        #get the average h, s, v
-        mean_h = int(np.mean(hsv[:,:,0]))
-        mean_s = int(np.mean(hsv[:,:,1]))
-        mean_v = int(np.mean(hsv[:,:,2]))
         
-        avg_color = np.array([mean_h, mean_s, mean_v])
+        mask = cv.inRange(hsv,(lowerCo),(upperCo))
+        _,mask = cv.threshold(mask,127,255,cv.THRESH_BINARY)
+        contours,_ = cv.findContours(mask,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
+
+        for contour in contours:
+            area = cv.contourArea(contour)
+            #MIGHTR HAVE TO CHANGE AREA OF CONTOUR
+            if area > 400:
+                x,y,wide,high = cv.boundingRect(contour)
+                return contour
+
+        #No contours large enough to be a park        
+        return None
+    
+
+    
         # print(avg_color)
         # print(upperColor1)
         # print(lowerColor1)
         
-        if all(avg_color <= upperCo) and all(avg_color >= lowerCo):
-            #print("Color was within range")
-            return True
-        else:
-            return False
+        # if all(avg_color <= upperCo) and all(avg_color >= lowerCo):
+        #     #print("Color was within range")
+        #     return True
+        # else:
+        #     return False
     except Exception as e:
         #get the line
         ex_type, ex_object, traceback = sys.exc_info()

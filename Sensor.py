@@ -86,10 +86,10 @@ class Camera(Sensor):
             #camera_subprocess.kill()
             pass
 
-    def SenseRealColour(self, ray_angle):
-        colour = Image.SenseRealColour(ray_angle, self.last_img)
+    def SenseRealColour(self):
+        contour = Image.SenseRealColour(self.last_img)
         print(f"image hash: {hash(self.last_img.tobytes())}")
-        return colour
+        return contour
 
 class PID(Sensor):
     def __init__(self, x, y, dir, parent, initial_sense):
